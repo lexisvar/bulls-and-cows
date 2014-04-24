@@ -1,0 +1,1 @@
+exports = require('./../../shared/GameEngine.js');

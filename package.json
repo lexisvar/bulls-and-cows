@@ -1,0 +1,22 @@
+{
+  "name": "bulls-and-cows",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Bulls & Cows - a number guessing game",
+  "dependencies": {
+    "sails": "0.9.16",
+    "grunt": "0.4.1",
+    "sails-disk": "~0.9.0",
+    "optimist": "0.3.4",
+    "jade": "~1.3.1",
+    "lodash": "~2.4.1"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "debug": "node debug app.js"
+  },
+  "main": "app.js",
+  "repository": "",
+  "author": "Andriyan Ivanov",
+  "license": "GPL"
+}
