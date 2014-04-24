@@ -124,26 +124,26 @@ module.exports = function(grunt) {
         },
 
         concat: {
-            topJs: {
+            concatHeaderJS: {
                 src: headerJS,
                 dest: '.tmp/public/concat/libs.js'
             },
-            js: {
+            concatFooterJS: {
                 src: commonJS.concat(footerJS),
                 dest: '.tmp/public/concat/production.js'
             },
-            css: {
+            concatCssFiles: {
                 src: cssFiles,
                 dest: '.tmp/public/concat/production.css'
             }
         },
 
         uglify: {
-            topDist: {
+            distHeaderJS: {
                 src: ['.tmp/public/concat/libs.js'],
                 dest: '.tmp/public/min/libs.js'
             },
-            dist: {
+            distFooterJS: {
                 src: ['.tmp/public/concat/production.js'],
                 dest: '.tmp/public/min/production.js'
             }
@@ -169,7 +169,7 @@ module.exports = function(grunt) {
                 }
             },
 
-            headerProductionJS: {
+            productionHeaderJS: {
                 options: {
                     startTag: '// TOP SCRIPTS',
                     endTag: '// TOP SCRIPTS END',
@@ -240,7 +240,7 @@ module.exports = function(grunt) {
                 // Assets and front/backend shared libs to watch:
                 files: ['assets/**/*', 'shared/*'],
                 // When assets are changed:
-                tasks: ['compileAssets', 'bundleAssets']
+                tasks: ['compileAssets', 'injectResourceTags']
             }
         }
     });
@@ -248,7 +248,7 @@ module.exports = function(grunt) {
     // When Sails is lifted:
     grunt.registerTask('default', [
         'compileAssets',
-        'bundleAssets',
+        'injectResourceTags',
         'watch'
     ]);
 
@@ -261,7 +261,7 @@ module.exports = function(grunt) {
     ]);
 
     // Bundle Assets
-    grunt.registerTask('bundleAssets', [
+    grunt.registerTask('injectResourceTags', [
         'sails-linker:developmentHeaderJS',
         'sails-linker:developmentFooterJS',
         'sails-linker:developmentCssFiles'
@@ -273,6 +273,8 @@ module.exports = function(grunt) {
         'concat',
         'uglify',
         'cssmin',
-        'bundleAssets'
+        'sails-linker:productionHeaderJS',
+        'sails-linker:productionFooterJS',
+        'sails-linker:productionCssFiles'
     ]);
 };
