@@ -1,29 +1,31 @@
-/**
- * sails.io.js
- *
- * This file allows you to send and receive socket.io messages to & from Sails 
- * by simulating a REST client interface on top of socket.io.
- *
- * It models its API after the $.ajax pattern from jQuery you might be familiar with.
- * 
- * So to switch from using AJAX to Socket.io, instead of:
- *    `$.post( url, [data], [cb] )`
- *
- * You would use:
- *    `socket.post( url, [data], [cb] )`
- *
- * For more information, visit:
- * http://sailsjs.org/#documentation
- */
+angular.module('Sails.Socket', [])
+.provider('Socket', function(){
+  var io = window.io
+    , socketClass = io.SocketNamespace
+    , socket, connected;
 
-(function (io) {
+  this.$get = function() {
+    var $ = {};
+    
+    $.socket = function(connect){
+      if(connect) {
+        socket = window.socket = io.connect();          
+        connected = true;
+      }
 
+      return socket || io;
+    }
 
-  // We'll be adding methods to `io.SocketNamespace.prototype`, the prototype for the 
-  // Socket instance returned when the browser connects with `io.connect()`
-  var Socket = io.SocketNamespace;
+    $.connect = function() {
+      return $.socket(true);
+    }
 
+    $.connected = function() {
+      return connected || false;
+    }
 
+    return $;
+  }
 
   /**
    * Simulate a GET request to sails
@@ -35,10 +37,9 @@
    * @param {Function} cb   ::    callback function to call when finished [optional]
    */
 
-  Socket.prototype.get = function (url, data, cb) {
+  socketClass.prototype.get = function (url, data, cb) {
     return this.request(url, data, cb, 'get');
   };
-
 
 
   /**
@@ -50,12 +51,9 @@
    * @param {Object} params ::    parameters to send with the request [optional]
    * @param {Function} cb   ::    callback function to call when finished [optional]
    */
-
-  Socket.prototype.post = function (url, data, cb) {
+  socketClass.prototype.post = function (url, data, cb) {
     return this.request(url, data, cb, 'post');
   };
-
-
 
   /**
    * Simulate a PUT request to sails
@@ -66,12 +64,9 @@
    * @param {Object} params ::    parameters to send with the request [optional]
    * @param {Function} cb   ::    callback function to call when finished [optional]
    */
-
-  Socket.prototype.put = function (url, data, cb) {
+  socketClass.prototype.put = function (url, data, cb) {
     return this.request(url, data, cb, 'put');
   };
-
-
 
   /**
    * Simulate a DELETE request to sails
@@ -82,22 +77,15 @@
    * @param {Object} params ::    parameters to send with the request [optional]
    * @param {Function} cb   ::    callback function to call when finished [optional]
    */
-
-  Socket.prototype['delete'] = function (url, data, cb) {
+  socketClass.prototype['delete'] = function (url, data, cb) {
     return this.request(url, data, cb, 'delete');
   };
-
-
-
 
    /**
    * Simulate HTTP over Socket.io
    * @api private :: but exposed for backwards compatibility w/ <= sails@~0.8
    */
-
-  Socket.prototype.request = request;
-  function request (url, data, cb, method) {
-
+  socketClass.prototype.request = function (url, data, cb, method) {
     var socket = this;
 
     var usage = 'Usage:\n socket.' +
@@ -110,7 +98,6 @@
     // If method is undefined, use 'get'
     method = method || 'get';
 
-
     if ( typeof url !== 'string' ) {
       throw new Error('Invalid or missing URL!\n' + usage);
     }
@@ -122,26 +109,22 @@
     }
 
     // Build to request
-    var json = io.JSON.stringify({
+    var json = window.io.JSON.stringify({
       url: url,
       data: data
     });
-
 
     // Send the message over the socket
     socket.emit(method, json, function afterEmitted (result) {
 
       var parsedResult = result;
-
-      if (result && typeof result === 'string') {
-        try {
-          parsedResult = io.JSON.parse(result);
-        } catch (e) {
-          if (typeof console !== 'undefined') {
-            console.warn("Could not parse:", result, e);
-          }
-          throw new Error("Server response could not be parsed!\n" + result);
+      try {
+        parsedResult = window.io.JSON.parse(result);
+      } catch (e) {
+        if (typeof console !== 'undefined') {
+          console.warn("Could not parse:", result, e);
         }
+        throw new Error("Server response could not be parsed!\n" + result);
       }
 
       // TODO: Handle errors more effectively
@@ -152,15 +135,6 @@
       cb && cb(parsedResult);
 
     });
-  }
-  
+  }    
 
-
-
-}) (
-
-  // In case you're wrapping socket.io to prevent pollution of the global namespace,
-  // you can replace `window.io` with your own `io` here:
-  window.io
-
-);
+});
