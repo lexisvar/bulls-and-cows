@@ -4,140 +4,138 @@
  * bundle and converted into an Angular module
  */
 angular.module('Sails.Socket', [])
-    .provider('$socket', function() {
-        var io = window.io,
-            socketClass = io.SocketNamespace,
-            socket, connected;
+  .provider('$socket', function() {
+    var io = window.io,
+      socketClass = io.SocketNamespace,
+      socket, connected;
 
-        this.$get = function() {
-            var $ = {};
+    this.$get = function() {
+      var $ = {};
 
-            $.socket = function(connect) {
-                if (connect) {
-                    socket = window.socket = io.connect();
-                    connected = true;
-                }
-
-                return socket || io;
-            }
-
-            $.connect = function() {
-                return $.socket(true);
-            }
-
-            $.connected = function() {
-                return connected || false;
-            }
-
-            return $;
+      $.socket = function(connect) {
+        if (connect) {
+          socket = window.socket = io.connect();
+          connected = true;
         }
 
-        /**
-         * Simulate a GET request to sails
-         * e.g.
-         *    `socket.get('/user/3', Stats.populate)`
-         *
-         * @param {String} url    ::    destination URL
-         * @param {Object} params ::    parameters to send with the request [optional]
-         * @param {Function} cb   ::    callback function to call when finished [optional]
-         */
-        socketClass.prototype.get = function(url, data, cb) {
-            return this.request(url, data, cb, 'get');
-        };
+        return socket || io;
+      }
 
-        /**
-         * Simulate a POST request to sails
-         * e.g.
-         *    `socket.post('/event', newMeeting, $spinner.hide)`
-         *
-         * @param {String} url    ::    destination URL
-         * @param {Object} params ::    parameters to send with the request [optional]
-         * @param {Function} cb   ::    callback function to call when finished [optional]
-         */
-        socketClass.prototype.post = function(url, data, cb) {
-            return this.request(url, data, cb, 'post');
-        };
+      $.connect = function() {
+        return $.socket(true);
+      }
 
-        /**
-         * Simulate a PUT request to sails
-         * e.g.
-         *    `socket.post('/event/3', changedFields, $spinner.hide)`
-         *
-         * @param {String} url    ::    destination URL
-         * @param {Object} params ::    parameters to send with the request [optional]
-         * @param {Function} cb   ::    callback function to call when finished [optional]
-         */
-        socketClass.prototype.put = function(url, data, cb) {
-            return this.request(url, data, cb, 'put');
-        };
+      $.connected = function() {
+        return connected || false;
+      }
 
-        /**
-         * Simulate a DELETE request to sails
-         * e.g.
-         *    `socket.delete('/event', $spinner.hide)`
-         *
-         * @param {String} url    ::    destination URL
-         * @param {Object} params ::    parameters to send with the request [optional]
-         * @param {Function} cb   ::    callback function to call when finished [optional]
-         */
-        socketClass.prototype['delete'] = function(url, data, cb) {
-            return this.request(url, data, cb, 'delete');
-        };
+      return $;
+    }
 
-        /**
-         * Simulate HTTP over Socket.io
-         * @api private :: but exposed for backwards compatibility w/ <= sails@~0.8
-         */
-        socketClass.prototype.request = function(url, data, cb, method) {
-            var socket = this;
+    /**
+     * Simulate a GET request to sails
+     * e.g.
+     *    `socket.get('/user/3', Stats.populate)`
+     *
+     * @param {String} url    ::    destination URL
+     * @param {Object} params ::    parameters to send with the request [optional]
+     * @param {Function} cb   ::    callback function to call when finished [optional]
+     */
+    socketClass.prototype.get = function(url, data, cb) {
+      return this.request(url, data, cb, 'get');
+    };
 
-            var usage = 'Usage:\n socket.' +
-                (method || 'request') +
-                '( destinationURL, dataToSend, fnToCallWhenComplete )';
+    /**
+     * Simulate a POST request to sails
+     * e.g.
+     *    `socket.post('/event', newMeeting, $spinner.hide)`
+     *
+     * @param {String} url    ::    destination URL
+     * @param {Object} params ::    parameters to send with the request [optional]
+     * @param {Function} cb   ::    callback function to call when finished [optional]
+     */
+    socketClass.prototype.post = function(url, data, cb) {
+      return this.request(url, data, cb, 'post');
+    };
 
-            // Remove trailing slashes and spaces
-            url = url.replace(/^(.+)\/*\s*$/, '$1');
+    /**
+     * Simulate a PUT request to sails
+     * e.g.
+     *    `socket.post('/event/3', changedFields, $spinner.hide)`
+     *
+     * @param {String} url    ::    destination URL
+     * @param {Object} params ::    parameters to send with the request [optional]
+     * @param {Function} cb   ::    callback function to call when finished [optional]
+     */
+    socketClass.prototype.put = function(url, data, cb) {
+      return this.request(url, data, cb, 'put');
+    };
 
-            // If method is undefined, use 'get'
-            method = method || 'get';
+    /**
+     * Simulate a DELETE request to sails
+     * e.g.
+     *    `socket.delete('/event', $spinner.hide)`
+     *
+     * @param {String} url    ::    destination URL
+     * @param {Object} params ::    parameters to send with the request [optional]
+     * @param {Function} cb   ::    callback function to call when finished [optional]
+     */
+    socketClass.prototype['delete'] = function(url, data, cb) {
+      return this.request(url, data, cb, 'delete');
+    };
 
-            if (typeof url !== 'string') {
-                throw new Error('Invalid or missing URL!\n' + usage);
-            }
+    /**
+     * Simulate HTTP over Socket.io
+     * @api private :: but exposed for backwards compatibility w/ <= sails@~0.8
+     */
+    socketClass.prototype.request = function(url, data, cb, method) {
+      var socket = this;
 
-            // Allow data arg to be optional
-            if (typeof data === 'function') {
-                cb = data;
-                data = {};
-            }
+      var usage = 'Usage:\n socket.' +
+        (method || 'request') +
+        '( destinationURL, dataToSend, fnToCallWhenComplete )';
 
-            // Build to request
-            var json = window.io.JSON.stringify({
-                url: url,
-                data: data
-            });
+      // Remove trailing slashes and spaces
+      url = url.replace(/^(.+)\/*\s*$/, '$1');
 
-            // Send the message over the socket
-            socket.emit(method, json, function afterEmitted(result) {
+      // If method is undefined, use 'get'
+      method = method || 'get';
 
-                var parsedResult = result;
-                try {
-                    parsedResult = window.io.JSON.parse(result);
-                } catch (e) {
-                    if (typeof console !== 'undefined') {
-                        console.warn("Could not parse:", result, e);
-                    }
-                    throw new Error("Server response could not be parsed!\n" + result);
-                }
+      if (typeof url !== 'string') {
+        throw new Error('Invalid or missing URL!\n' + usage);
+      }
 
-                // TODO: Handle errors more effectively
-                if (parsedResult === 404) throw new Error("404: Not found");
-                if (parsedResult === 403) throw new Error("403: Forbidden");
-                if (parsedResult === 500) throw new Error("500: Server error");
+      // Allow data arg to be optional
+      if (typeof data === 'function') {
+        cb = data;
+        data = {};
+      }
 
-                cb && cb(parsedResult);
+      // Build to request
+      var json = window.io.JSON.stringify({
+        url: url,
+        data: data
+      });
 
-            });
+      // Send the message over the socket
+      socket.emit(method, json, function afterEmitted(result) {
+
+        var parsedResult = result;
+        try {
+          parsedResult = window.io.JSON.parse(result);
+        } catch (e) {
+          if (typeof console !== 'undefined') {
+            console.warn("Could not parse:", result, e);
+          }
+          throw new Error("Server response could not be parsed!\n" + result);
         }
 
-    });
+        // TODO: Handle errors more effectively
+        if (parsedResult === 404) throw new Error("404: Not found");
+        if (parsedResult === 403) throw new Error("403: Forbidden");
+        if (parsedResult === 500) throw new Error("500: Server error");
+
+        cb && cb(parsedResult);
+      });
+    }
+  });

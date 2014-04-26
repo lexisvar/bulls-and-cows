@@ -14,19 +14,18 @@ div.splash {
   left: 50%;
 	margin: -225px 0 0 -202px;
 	background: url(../images/splash.png) top center no-repeat;
-	background-size: 100%;
 
 	button { 
+        .transition(all 0.5s ease-in);
+        .border-radius(10px);
+        .drop-shadow(3 3 0 #000);
 		cursor: pointer;
 		position: absolute;
-    bottom: 20px;
+        bottom: 20px;
 		left: 50%;
 		font-size: 32px;
 		line-height: 180%;
 		padding: 0 10px;
-		.transition(0.5s ease-in);
-		.border-radius(10px);
-		.drop-shadow(3 3 0 #000);
 		background-color: #efbe7e;
 		&:hover {
 			.background-image(linear-gradient(to bottom, #efbe7e 0%, #ffffff 100%));	

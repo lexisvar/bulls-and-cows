@@ -1,1 +1,1 @@
-angular.module('BullsAndCows', ['Sails.Socket']);
+angular.module('BullsAndCows', ['Sails.Socket', 'BullsAndCows.Templates']);
