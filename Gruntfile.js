@@ -191,9 +191,7 @@ module.exports = function (grunt) {
             collapseBooleanAttributes: true,
             collapseWithspace: true,
             removeAttributeQuotes: true,
-            removeComments: true,
-            removeEmptyAttributes: true,
-            removeRedundantAttributes: true
+            removeComments: true
           }
         }
       }
@@ -283,7 +281,7 @@ module.exports = function (grunt) {
 
       assets: {
         // Assets and front/backend shared libs to watch:
-        files: ['assets/**/*', 'shared/*'],
+        files: ['assets/**/*', 'shared/*', 'views/templates/*'],
         // When assets are changed:
         tasks: ['compileAssets', 'injectResourceTags']
       }
