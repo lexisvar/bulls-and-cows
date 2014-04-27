@@ -3,8 +3,8 @@
  * More information on using Grunt to work with static assets:
  * http://gruntjs.com/configuring-tasks
  */
-
 module.exports = function (grunt) {
+  'use strict';
 
   // CSS
   var cssFiles = [
@@ -14,20 +14,20 @@ module.exports = function (grunt) {
   // JS to be injected into the header
   var headerJS = [
     'vendor/jquery/dist/jquery.min.js',
-    'vendor/angular/angular.min.js',
+    'vendor/angular/angular.js',
     'vendor/socket.io-client/dist/socket.io.min.js',
   ];
 
   // JS to be injected into the footer
   var footerJS = [
-    'js/packages/*.js', // app dependencies
-    'js/app/app.js',
-    'js/app/providers/*.js',
-    'js/app/config.js',
-    'js/app/directives/*.js',
-    'js/app/factories/*.js',
-    'js/app/routes.js',
-    'js/app/controllers/*.js',
+    'js/game/app.js',
+    'js/game/providers/*.js',
+    'js/game/templates.js',
+    'js/game/config.js',
+    'js/game/routes.js',
+    'js/game/directives/*.js',
+    'js/game/factories/*.js',
+    'js/game/controllers/*.js',
     'js/*.js'
   ];
 
@@ -183,9 +183,9 @@ module.exports = function (grunt) {
         cwd: '.tmp/public/templates',
         matchBase: true,
         src: '*.html',
-        dest: '.tmp/public/js/packages/templates.js',
+        dest: '.tmp/public/js/game/templates.js',
         options: {
-          module: 'BullsAndCows.Templates',
+          module: 'BullsAndCows',
           prefix: 'templates',
           htmlmin: {
             collapseBooleanAttributes: true,
@@ -276,9 +276,14 @@ module.exports = function (grunt) {
 
     // Watch
     watch: {
+      // api changes -> restart app
+      api: {
+        files: ['api/**/*']
+      },
+
       assets: {
         // Assets and front/backend shared libs to watch:
-        files: ['assets/**/*', 'shared/*', 'views/templates/**/*'],
+        files: ['assets/**/*', 'shared/*'],
         // When assets are changed:
         tasks: ['compileAssets', 'injectResourceTags']
       }

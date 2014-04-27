@@ -1,0 +1,7 @@
+.splash
+  button(ng-click="continueToLobby()") Continue
+.askName(ng-show="player.askName")
+  form(ng-submit="enterName()")
+    p Enter name:
+    input(ng-model="player.name")
+    button(type="submit") OK

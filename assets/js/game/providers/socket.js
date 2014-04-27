@@ -3,33 +3,22 @@
  * Sails backend, extracted from the default Sails
  * bundle and converted into an Angular module
  */
-angular.module('Sails.Socket', [])
-  .provider('$socket', function() {
+angular.module('BullsAndCows', [])
+  .provider('$socket', function () {
     var io = window.io,
       socketClass = io.SocketNamespace,
-      socket, connected;
+      socket = window.socket = io.connect();
 
-    this.$get = function() {
-      var $ = {};
-
-      $.socket = function(connect) {
-        if (connect) {
-          socket = window.socket = io.connect();
-          connected = true;
-        }
-
-        return socket || io;
+    this.$get = function () {
+      return {
+        socket: window.socket,
+        get: window.socket.get,
+        post: window.socket.post,
+        put: window.socket.put,
+        'delete': window.socket['delete'],
+        request: window.socket.request,
+        io: window.io
       }
-
-      $.connect = function() {
-        return $.socket(true);
-      }
-
-      $.connected = function() {
-        return connected || false;
-      }
-
-      return $;
     }
 
     /**
@@ -41,7 +30,7 @@ angular.module('Sails.Socket', [])
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype.get = function(url, data, cb) {
+    socketClass.prototype.get = function (url, data, cb) {
       return this.request(url, data, cb, 'get');
     };
 
@@ -54,7 +43,7 @@ angular.module('Sails.Socket', [])
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype.post = function(url, data, cb) {
+    socketClass.prototype.post = function (url, data, cb) {
       return this.request(url, data, cb, 'post');
     };
 
@@ -67,7 +56,7 @@ angular.module('Sails.Socket', [])
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype.put = function(url, data, cb) {
+    socketClass.prototype.put = function (url, data, cb) {
       return this.request(url, data, cb, 'put');
     };
 
@@ -80,7 +69,7 @@ angular.module('Sails.Socket', [])
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype['delete'] = function(url, data, cb) {
+    socketClass.prototype['delete'] = function (url, data, cb) {
       return this.request(url, data, cb, 'delete');
     };
 
@@ -88,9 +77,7 @@ angular.module('Sails.Socket', [])
      * Simulate HTTP over Socket.io
      * @api private :: but exposed for backwards compatibility w/ <= sails@~0.8
      */
-    socketClass.prototype.request = function(url, data, cb, method) {
-      var socket = this;
-
+    socketClass.prototype.request = function (url, data, cb, method) {
       var usage = 'Usage:\n socket.' +
         (method || 'request') +
         '( destinationURL, dataToSend, fnToCallWhenComplete )';
