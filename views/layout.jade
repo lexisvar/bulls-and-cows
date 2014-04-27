@@ -11,7 +11,7 @@ html
   include _meta/styles
   block styles
   body
-    section(ng-view ng-app="BullsAndCows")
+    section(ng-view ng-app="BullsAndCows" ng-controller="MainController")
       block body
       block footer
     - /* includes JavaScripts loaded in the footer of the page */

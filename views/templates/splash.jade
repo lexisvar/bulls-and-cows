@@ -1,7 +1,20 @@
+// Splash screen
 .splash
   button(ng-click="continueToLobby()") Continue
-.askName(ng-show="player.askName")
-  form(ng-submit="enterName()")
-    p Enter name:
-    input(ng-model="player.name")
+
+// Enter name dialogue
+.enterName(ng-show="player.enterName")
+  form(ng-submit="setPlayerName()")
+    p.error(ng-show="player.nameError") {{getNameError()}}
+    label(for="player-name") Enter name:
+      input(id="player-name" ng-model="player.name")
     button(type="submit") OK
+
+// Welcome message
+.welcomeMessage(ng-show="welcomeScreen")
+  h1 Hey, {{player.name}}
+  div(ng-switch="player.isReturning")
+    h3(ng-switch-when="true")
+      | Welcome Back!
+    h3(ng-switch-default)
+      | Good to have you here!

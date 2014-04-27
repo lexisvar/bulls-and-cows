@@ -3,16 +3,15 @@ angular.module('BullsAndCows').config([
   function ($routeProvider) {
     'use strict';
 
-    function route(controller, template) {
-      return {
-        controller: controller + 'Controller',
-        templateUrl: 'templates/' + template + '.html'
-      }
-    }
-
     $routeProvider
-      .when('/', route('Splash', 'splash'))
-      .when('/lobby', route('Lobby', 'lobby'))
+      .when('/', {
+        controller: 'SplashController',
+        templateUrl: 'templates/splash.html'
+      })
+      .when('/lobby', {
+        controller: 'LobbyController',
+        templateUrl: 'templates/lobby.html'
+      })
       .otherwise({
         redirectTo: '/'
       });

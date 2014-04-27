@@ -1,5 +1,13 @@
 angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket',
   function ($scope, $socket) {
-    alert('Lobby controller is loaded');
+    $scope.games = [];
+
+    $scope.newGame = function () {
+
+    }
+
+    $scope.joinGame = function () {
+
+    }
   }
 ]);
