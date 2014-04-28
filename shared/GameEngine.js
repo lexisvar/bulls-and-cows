@@ -54,23 +54,21 @@
     $this.compareScores = function(compareSet, versusSet) {
         var scoreCompare = compareSet.cows + compareSet.bulls,
             scoreVersus = versusSet.cows + versusSet.bulls,
-            moreCows = compareSet.cows >= versusSet.cows,
+            possiblyMoreCows = compareSet.cows >= versusSet.cows,
             equalBulls = compareSet.bulls == versusSet.bulls;
 
-        return scoreCompare == scoreVersus && moreCows && equalBulls;
+        return scoreCompare == scoreVersus && possiblyMoreCows && equalBulls;
     }
 
     $this.filterGuessList = function(secretNumber, cowsAndBulls, guessList) {
-        var secretTest, secretProbe, testScore = 0,
-            previousScore = cowsAndBulls.cows + cowsAndBulls.bulls,
+        var secretTest, secretProbe,
             index = -1,
-            result = [];
-
-        // remove secretNumber, assuming its not a match
-        guessList.splice(guessList.indexOf(secretNumber.toString()), 1);
+            result = [],
+            secretNumber = secretNumber.toString(),
+            length = guessList.length;
 
         // filter rest of the members
-        while (++index < guessList.length) {
+        while (++index < length) {
             secretProbe = guessList[index];
             secretTest = $this.findCowsAndBulls(secretProbe, secretNumber);
             if (true === $this.compareScores(secretTest, cowsAndBulls)) {
