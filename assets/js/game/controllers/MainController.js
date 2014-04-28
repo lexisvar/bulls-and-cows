@@ -18,5 +18,18 @@ angular.module('BullsAndCows').controller('MainController', ['$scope', '$rootSco
       });
     }
 
+    /**
+     * Get available game modes from server
+     * @type {Object}
+     */
+    $rootScope.gameModes = {};
+    $rootScope.gameModesLoaded = false;
+
+    $socket.get('/game/getModes', null, function (res) {
+      $rootScope.$apply(function () {
+        $rootScope.gameModes = res.modes;
+        $rootScope.gameModesLoaded = true;
+      });
+    });
   }
-])
+]);
