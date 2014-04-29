@@ -68,8 +68,8 @@ module.exports = function (grunt) {
   grunt.loadTasks(depsPath + '/grunt-contrib-cssmin/tasks');
   grunt.loadTasks(depsPath + '/grunt-contrib-less/tasks');
   grunt.loadTasks(depsPath + '/grunt-sails-linker/tasks');
-  grunt.loadTasks('node_modules/grunt-angular-templates/tasks');
-  grunt.loadTasks('node_modules/grunt-contrib-jade/tasks');
+  grunt.loadNpmTasks('grunt-angular-templates');
+  grunt.loadNpmTasks('grunt-contrib-jade');
 
   // Project configuration.
   grunt.initConfig({
