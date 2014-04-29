@@ -13,7 +13,6 @@ module.exports = function (grunt) {
 
   // JS to be injected into the header
   var headerJS = [
-    'vendor/jquery/dist/jquery.min.js',
     'vendor/angular/angular.js',
     'vendor/socket.io-client/dist/socket.io.min.js'
   ];

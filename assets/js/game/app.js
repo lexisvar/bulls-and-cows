@@ -1,1 +1,1 @@
-angular.module('BullsAndCows');
+angular.module('BullsAndCows', []);
