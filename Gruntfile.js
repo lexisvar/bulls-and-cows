@@ -39,13 +39,10 @@ module.exports = function (grunt) {
   /**
    * Assign .tmp paths to assets
    */
-
-  // Modify css file injection paths to use 
   cssFiles = cssFiles.map(function (path) {
     return '.tmp/public/' + path;
   });
 
-  // Modify js file injection paths to use 
   footerJS = footerJS.map(function (path) {
     return '.tmp/public/' + path;
   });
@@ -53,6 +50,9 @@ module.exports = function (grunt) {
   sharedJS = sharedJS.map(function (path) {
     return '.tmp/public/js/shared/' + path;
   });
+
+  // merge footer and shared
+  footerJS = footerJS.concat(sharedJS);
 
   headerJS = headerJS.map(function (path) {
     return '.tmp/public/' + path;
@@ -135,7 +135,7 @@ module.exports = function (grunt) {
         dest: '.tmp/public/concat/libs.js'
       },
       concatFooterJS: {
-        src: sharedJS.concat(footerJS),
+        src: footerJS,
         dest: '.tmp/public/concat/production.js'
       },
       concatCssFiles: {
@@ -230,7 +230,7 @@ module.exports = function (grunt) {
           appRoot: '.tmp/public'
         },
         files: {
-          'views/_meta/*.jade': sharedJS.concat(footerJS)
+          'views/_meta/*.jade': footerJS
         }
       },
 

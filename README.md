@@ -6,7 +6,7 @@ Welcome to the the page of my humble effort to make a Bulls & Cows game :)
 The application includes an implementation of a number guessing mechanism, based on the concept of a reduced multitude of options. Basically you compare the results versus a list of possible options, until its reduced to a single number. To execute the proof-of-concept code, run the following command: 
 
 ```
-node poc.js
+node proof-of-concept.js
 ```
 
 ### Installation
