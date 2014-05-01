@@ -24,8 +24,10 @@ module.exports = function (grunt) {
     'js/game/templates.js',
     'js/game/config.js',
     'js/game/routes.js',
+    'js/game/rootScope.js',
     'js/game/directives/*.js',
     'js/game/factories/*.js',
+    'js/game/services/*.js',
     'js/game/controllers/*.js',
     'js/*.js'
   ];
@@ -34,7 +36,6 @@ module.exports = function (grunt) {
   var sharedJS = [
     'GameEngine.js'
   ];
-
 
   /**
    * Assign .tmp paths to assets

@@ -1,7 +1,7 @@
 var scope;
-angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket', '$location', '$rootScope',
-  function ($scope, $socket, $location, $rootScope) {
-    scope = $scope;
+angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket', '$location', 'PlayModes',
+  function ($scope, $socket, $location, Modes) {
+
     $scope.games = [{
       id: 1,
       name: "Somebody's game",
@@ -14,12 +14,13 @@ angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket
       mode: "Co-op"
     }];
 
-    $scope.root = $rootScope;
-    $scope.modeSelected = null;
+    $scope.config = {
+      modeSelected: null,
+      showGameDialog: null,
+      selectedGameId: null,
+      playModes: Modes.all
+    }
 
-    //$scope.gameModes = $rootScope.gameModes;
-    $scope.joinGameId = null;
-    $scope.gameDialogue = false;
 
     /*
     // register/unregister listeners
@@ -43,32 +44,28 @@ angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket
     })();*/
 
 
-    $scope.toggleJoinGame = function (gameId) {
-      $scope.joinGameId = $scope.joinGameId === gameId ? null : gameId;
+    $scope.selectGameToJoin = function (gameId) {
+      $scope.selectedGameId = $scope.selectedGameId === gameId ? null : gameId;
     }
 
-    $scope.getGameModes = function () {
-      return $scope.gameModes;
-    }
-
-    $scope.isCurrentJoinGame = function (gameId) {
-      return gameId === $scope.joinGameId;
+    $scope.isCurrentlySelectedGame = function (gameId) {
+      return gameId === $scope.config.selectedGameId;
     }
 
     $scope.toggleGameDialogue = function () {
-      $scope.gameDialogue = !$scope.gameDialogue;
+      $scope.config.showGameDialog = !$scope.config.showGameDialog;
     }
 
-    $scope.joinGameDisabled = function () {
-      return $scope.joinGameId === null;
+    $scope.getGameModes = function () {
+      return $scope.config.playModes;
     }
 
-    $scope.setGameMode = function (gameMode) {
-      $scope.modeSelected = gameMode;
+    $scope.isJoinDisabled = function () {
+      return $scope.config.selectedGameId === null;
     }
 
-    $scope.startGameDisabled = function () {
-      return $scope.modeSelected === null;
+    $scope.setPlayMode = function (gameMode) {
+      $scope.config.modeSelected = gameMode;
     }
 
     $scope.startGame = function () {
@@ -78,6 +75,10 @@ angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket
       }
 
       $location.path('/game');
+    }
+
+    $scope.isStartDisabled = function () {
+      return $scope.modeSelected === null;
     }
 
     $scope.hasGames = function () {

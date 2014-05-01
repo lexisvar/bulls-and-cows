@@ -8,21 +8,21 @@ section.games
     tbody
       tr(ng-show="!hasGames()")
         td(colspan="3") There're games at the moment
-      tr(ng-show="hasGames()" ng-repeat="game in games" ng-click="toggleJoinGame(game.id)" ng-class="{current: isCurrentJoinGame(game.id)}")
+      tr(ng-show="hasGames()" ng-repeat="game in games" ng-click="selectGameToJoin(game.id)" ng-class="{current: isCurrentlySelectedGame(game.id)}")
         td {{game.name}}
         td {{game.player}}
         td {{game.mode}}
   .buttons
     button(ng-click="toggleGameDialogue()") Create New Game
-    button(ng-click="joinGame()" ng-disabled="joinGameDisabled()") Join Game
+    button(ng-click="joinGame()" ng-disabled="isJoinDisabled()") Join Game
 
-  .newGameDialogue(ng-show="gameDialogue")
+  .newGameDialogue(ng-show="config.showGameDialog")
     div Choose game mode
     // ng-model doesn't work as expected! (probably cause of ng-repeat) 
     // using ng-change to apply mode value change
-    label(ng-repeat="(mode, gameMode) in root.gameModes") {{gameMode.title}}
-      input(type="radio" name="mode" ng-model="modeSelected" ng-change="setGameMode('{{mode}}')")
+    label(ng-repeat="(modeId, mode) in config.playModes") {{mode.title}}
+      input(type="radio" name="mode" ng-model="config.modeSelected" ng-change="setPlayMode('{{modeId}}')")
 
     .buttons
-      button(ng-click="startGame()" ng-disabled="startGameDisabled()") Start Game
+      button(ng-click="startGame()" ng-disabled="isStartDisabled()") Start Game
       button(ng-click="toggleGameDialogue()") Cancel

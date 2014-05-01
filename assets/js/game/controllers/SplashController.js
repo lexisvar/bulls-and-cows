@@ -1,60 +1,77 @@
-angular.module('BullsAndCows').controller('SplashController', ['$scope', '$socket', '$location', '$timeout', '$rootScope',
-  function ($scope, $socket, $location, $timeout, $rootScope) {
+angular.module('BullsAndCows').controller('SplashController', [
+  '$scope', 'Server', '$location', '$timeout', '$rootScope',
+  function ($scope, Server, $location, $timeout, $root) {
     'use strict';
 
-    $scope.welcomeScreen = false;
-    $scope.player = {
-      enterName: false,
+    /**
+     * Controller state params
+     */
+    $scope.state = {
+      showWelcome: false,
+      showNameForm: false,
       isReturning: false,
-      name: null,
-      nameError: false,
-      nameErrorMessage: ''
+      error: null,
+      name: null
     };
 
+    var lobbyRedirectTimeout = 2000;
+
+    /**
+     * Displays the Welcome message and schedules a redirect to the Lobby
+     * @param  {Boolean} isReturning A flag that indicated if the player is newcomer
+     *                               or a returning one
+     */
+    var displayWelcome = function (isReturning) {
+      $scope.state = {
+        isReturning: isReturning ? true : false,
+        showWelcome: true,
+        showNameForm: false,
+        error: null
+      }
+
+      $timeout(function () {
+        $location.path('/lobby')
+      }, lobbyRedirectTimeout);
+    }
+
+    /**
+     * Checks if a player is ready to continu to the lobby, if they are
+     * show them the Welcome screen, otherwise show the "Enter name" form
+     */
     $scope.continueToLobby = function () {
-      var name = $rootScope.playerId;
-      if (undefined !== name) {
-        $scope.displayWelcomeMessage(name, true);
+      if (true === $root.hasPlayerId()) {
+        displayWelcome(true);
       } else {
-        $scope.player.enterName = true;
+        $scope.state.showNameForm = true;
       }
     }
 
-    $scope.setPlayerName = function () {
+    /**
+     * Register a player, show erros on fail and welcome message otherwise,
+     * successful registration registers the player values in the $rootScope
+     */
+    $scope.registerPlayer = function () {
       var data = {
-        name: $scope.player.name
+        name: $scope.state.name
       };
 
-      $socket.get('/player/setName', data, function (res) {
-        if (true === res.state) {
-          $scope.displayWelcomeMessage(res.name, false, true);
-        } else {
-          console.log(res);
-          $scope.$apply(function () {
-            $scope.player.nameError = true;
-            $scope.player.nameErrorMessage = res.state;
-          });
-        }
-      });
+      $scope.state.error = null;
+
+      Server.registerPlayer(data,
+        function onSuccess(response) {
+          displayWelcome(false);
+        },
+        function onError(errors) {
+          $scope.state.error = errors.name;
+        });
     }
 
-    $scope.getNameError = function () {
-      return $scope.player.nameErrorMessage;
-    }
-
-    $scope.displayWelcomeMessage = function (name, isReturning, cb) {
-      var apply = function () {
-        $scope.player.enterName = false;
-        $scope.player.isReturning = isReturning;
-        $scope.player.name = $rootScope.playerId = name;
-        $scope.welcomeScreen = true;
-      };
-
-      true === cb ? $scope.$apply(apply) : apply();
-
-      $timeout(function () {
-        $location.path('/lobby');
-      }, 2000);
+    /**
+     * A state accessor returning true if there're errors to display on
+     * the name form
+     */
+    $scope.showError = function () {
+      return $scope.state.error === null ? false : true;
     }
   }
 ]);

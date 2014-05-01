@@ -10,9 +10,11 @@ html
   - /* includes CSS Styles */
   include _meta/styles
   block styles
-  body(ng-app="BullsAndCows")
-    section(ng-view ng-controller="MainController")
+  body(ng-app="BullsAndCows" ng-controller="MainController")
+    section(ng-view ng-show="$root.flags.appLoaded")
       block body
       block footer
+    section.loading(ng-show="$root.flags.showLoading")
+      | Loading screen
     - /* includes JavaScripts loaded in the footer of the page */
     include _meta/bottomScripts

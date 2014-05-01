@@ -1,44 +1,50 @@
-var nameRegex = /^(?![0-9])[A-Za-z0-9 ]{3,30}$/
+(function ($) {
 
-var isValidName = function (name) {
-  if (null === name || 'function' !== typeof name.trim || !nameRegex.test(name.trim())) {
-    return "Name should be between 3-30 characters long, " +
-      "containing alphanumeric characters, spaces " +
-      "and not starting with a number";
+  /**
+   * Register a new player, a valid name would be required, otherwise
+   * an error is dispatched to the user.
+   *
+   * If registration goes smoothly, register a new player session
+   * and dispatch the session info back to the frontend
+   */
+  $.register = function (req, res) {
+    if (Session.hasPlayerSession(req))
+      return req.json(Session.getInfo(req));
+
+    Player.create({
+      name: req.param('name')
+    }).done(
+      function (errors, entity) {
+        if (errors) {
+          return res.json({
+            errors: Errors.format(Player, errors)
+          });
+        }
+        Session.setPlayerInfo(req, entity);
+        return res.json(Session.getInfo(req));
+      });
   }
 
-  return true;
-}
-
-module.exports = {
-  setName: function (req, res) {
-    var name = req.param('name'),
-      state = isValidName(name);
-
-    if (true === state) {
-      req.session.playerName = name;
-    }
-
-    return res.json({
-      state: state,
-      name: name
-    });
-
-  },
-
-  getName: function (req, res) {
-    var state = false,
-      name = req.session.playerName || null,
-      currentGame = req.session.currentGame || null;
-
-    if (null !== name) {
-      state = true;
-    }
-
-    return res.json({
-      state: state,
-      currentGame: currentGame,
-      name: name
-    });
+  /**
+   * Get the current player' session info, if any, the Session service
+   * would handle empty session states and return them as null
+   */
+  $.get = function (req, res) {
+    return res.json(Session.getInfo(req));
   }
-}
+
+  /**
+   * Return the number of players online
+   * @todo  add socket subscription
+   */
+  $.online = function (req, res) {
+    Player.count({
+      isOnline: true
+    }).done(function (errors, result) {
+      return res.json({
+        count: result
+      });
+    })
+  }
+
+})(module.exports);

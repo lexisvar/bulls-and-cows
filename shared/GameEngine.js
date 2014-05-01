@@ -1,6 +1,6 @@
 (function ($) {
 
-  $.isValidNumberRegex = /^(?!0)(?!.*(.).*\1)[\d]{4}$/;
+  var validNumberRegex = /^(?!0)(?!.*(.).*\1)[\d]{4}$/;
 
   /**
    * Check if a number is:
@@ -11,7 +11,7 @@
    * @return {Boolean}             True if its a valid number
    */
   $.isValidNumber = function (toValidate) {
-    return $.isValidNumberRegex.test(toValidate.toString());
+    return validNumberRegex.test(toValidate.toString());
   }
 
   var Set = [];
@@ -162,15 +162,20 @@
   /**
    * Attach model, based on environment
    */
+
   // if exports is defined
   if ('object' === typeof exports) {
     exports = $;
-  } else if ('object' === typeof angular) {
-    angular.module('BullsAndCows').factory('$engine', function () {
+  }
+  // if angular is defined
+  else if ('object' === typeof angular) {
+    angular.module('BullsAndCows').factory('Game', function () {
       return $;
     });
-  } else {
-    window['BullsAndCows.Engine'] = $;
+  }
+  // otherwise register to window
+  else {
+    window['BullsAndCows_Game'] = $;
   }
 
 })({});

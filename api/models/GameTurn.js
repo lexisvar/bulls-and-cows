@@ -1,22 +1,19 @@
-var ErrorMessages = {
-  guess: 'Guess is not a valid "Bulls and Cows" number'
-}
+(function ($) {
 
-module.exports = {
-  autoCreatedAt: false,
-  autoUpdatedAt: false,
-  types: {
-    gameNumber: function (number) {
-      return GameService.isValidNumber(number);
-    }
-  },
-  attributes: {
+  $.errorMessages = {
+    guess: 'Guess is not a valid "Bulls and Cows" number'
+  }
+
+  $.autoCreatedAt = false;
+  $.autoUpdatedAt = false;
+
+  $.attributes = {
     gameId: {
       type: 'integer',
       required: true,
     },
 
-    guessedBy: {
+    geussUserId: {
       type: 'string',
       required: true,
     },
@@ -36,27 +33,29 @@ module.exports = {
       type: 'integer',
       required: true
     }
-  },
+  }
 
-  afterCreate: function () {
-    GameTurn.countByGameId(this.gameId).done(
-      function (errors, result) {
-        Game.update({
-          id: this.gameId
-        }, {
-          turnsPlayed: result
-        }, function () {
+  $.types = {
+    isValidGameNumber: function (number) {
+      return GameService.isValidNumber(number);
+    }
+  }
 
-        });
-      });
-  },
+  $.afterCreate = function () {
+    $.updateCount(new Game(this.gameId));
+  }
 
-  errorMessages: function () {
-    return ErrorMessages;
-  },
-
-  toJSON: function () {
+  $.toJSON = function () {
     var json = this.toObject();
     delete json.id;
   }
-}
+
+  $.updateCount = function (game) {
+    this.countByGameId(game.id, function (error, count) {
+      game.update({
+        turnCount: count
+      });
+    });
+  }
+
+})(module.exports);

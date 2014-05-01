@@ -1,184 +1,74 @@
-/**
- * Game
- *
- * @module      :: Model
- * @description :: A short summary of how this model works and what it represents.
- *
- */
+(function ($) {
 
-var ErrorMessages = {
-  mode: 'Selected game mode is invalid',
-  title: 'A valid game title is required, it should alphanumeric and at least 5 characters long'
-}
-
-var ValidTitle = /^[a-zA-Z 0-9]{5,}$/;
-var privateGames = ['host', 'bot'];
-var publicGames = ['host', 'guest'];
-
-var nextPlayerTurn = function (current, mode) {
-  var gameMode = GameModeService.getByMode(mode);
-
-  // if a multiplayer game (e.g. public) - pick the other one
-  if (gameMode.isPublic) {
-    return publicGames.splice(publicGames.indexOf(current), 1)[0];
+  $.titleRegex = /^[a-zA-Z 0-9]{5,}$/;
+  $.errorMessages = {
+    title: 'A valid game title is required, it should ' +
+      'be alphanumeric and at least 5 characters long'
   }
 
-  // if a private game with both bot and player - pick the other one
-  if (gameMode.hasBot && gameMode.hasPlayer) {
-    return privateGames.splice(privateGames.indexOf(current), 1)[0];
-  }
-
-  // if a private game with only one type of player - return the same
-  return current;
-}
-
-module.exports = {
-  types: {
-    gameMode: function (mode) {
-      return GameModeService.isValid(mode);
-    },
-
-    gameTitle: function (title) {
-      var isPublic = GameModeService(this.mode);
-      if (isPublic && !ValidTitle.test(title.trim()))
-        return false;
-
-      return true;
-    }
-  },
-
-  attributes: {
-
+  $.attributes = {
     title: {
-      type: 'string'
+      type: 'string',
+      required: true,
+      isValidTitle: true
     },
 
-    createdBy: {
-      type: 'string',
+    // PLAYERS ID
+    hostPlayerId: {
+      type: 'integer',
       required: true
     },
-
-    guestUser: {
-      type: 'string'
-    },
-
-    secretNumber: {
+    guestPlayerId: {
       type: 'integer',
       required: true
     },
 
+    // SECRET NUMBERS
     hostSecret: {
-      type: 'integer'
+      type: 'integer',
+      required: true
     },
-
     guestSecret: {
-      type: 'integer'
-    },
-
-    isPublic: {
-      type: 'boolean'
-    },
-
-    isBotGame: {
-      type: 'boolean'
-    },
-
-    playerCount: {
-      type: 'integer'
-    },
-
-    mode: {
-      type: 'string',
-      gameMode: true,
+      type: 'integer',
       required: true
     },
 
-    nextTurn: {
-      type: 'string',
-    },
-
-    isOpen: {
+    // STATE FLAGS
+    hostTurn: {
       type: 'boolean',
       defaultsTo: false
     },
-
-    winnerName: {
-      type: 'string'
+    isMultiplayer: {
+      type: 'boolean',
+      defaultsTo: false
     },
-
+    isCooperative: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+    isWithBot: {
+      type: 'boolean',
+      defaultsTo: false
+    },
     isOver: {
       type: 'boolean',
       defaultsTo: false
-    },
-
-    turnsPlayed: {
-      type: 'integer',
-      defaultsTo: 0
     }
+  };
 
-  },
-
-  beforeCreate: function (values, cb) {
-    var mode = GameModeService.getByMode(mode);
-
-    // set public game status
-    values.isPublic = mode.isPublic;
-
-    // set the number of players (to estimate who has the next turn)
-    if (mode.isPublic) {
-      values.playerCount = 2;
-    } else {
-      values.playerCount = (mode.hasBot && mode.hasPlayer) ? 2 : 1;
+  $.types = {
+    isValidTitle: function (title) {
+      return this.isMultiplayer && ValidTitle.test(this.title)
     }
+  };
 
-    // set game to open if a public/multiplayer game
-    values.isOpen = values.isPublic;
-
-    // trim game title
+  $.beforeCreate = function (values, next) {
     values.title = values.title.trim();
+    next();
+  };
 
-    cb();
-  },
-
-  getSecretNumber: function (guessedBy) {
-    if (!this.isPublic)
-      return this.secretNumber;
-
-    if ('host' === guessedBy)
-      return this.guestSecret;
-
-    return this.hostSecret;
-  },
-
-  ownsTurn: function (isHost, guessedBy) {
-    if (1 === this.playerCount)
-      return true;
-
-    if ('bot' === guessedBy && 'bot' === this.nextTurn)
-      return true;
-
-    if (isHost && 'host' === this.nextTurn)
-      return true;
-
-    if (!isHost && 'guest' === this.nexTurn)
-      return true;
-
-    return false;
-  },
-
-  getGuessedBy: function (fromRequest, isHost) {
-    if ('bot' === fromRequest)
-      return fromRequest;
-
-    return isHost ? 'host' : 'guest';
-  },
-
-  getNextPlayerTurn: function () {
-    return nextPlayerTurn(this.nextTurn, this.mode);
-  },
-
-  errorMessages: function () {
-    return ErrorMessages;
-  }
-
-};
+  $.toggleTurn = function () {
+    if (this.isMultiplayer)
+      this.hostTurn = !this.hostTurn;
+  };
+})(module.exports);
