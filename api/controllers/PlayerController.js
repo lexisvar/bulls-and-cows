@@ -38,13 +38,13 @@
    * @todo  add socket subscription
    */
   $.online = function (req, res) {
-    Player.count({
-      isOnline: true
-    }).done(function (errors, result) {
-      return res.json({
-        count: result
-      });
-    })
+    return res.json({
+      online: SocketService.getOnline()
+    });
+  }
+
+  $.server = function (req, res) {
+    res.json(ServerPlayer.get('id'));
   }
 
 })(module.exports);

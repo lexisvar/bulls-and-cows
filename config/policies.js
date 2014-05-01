@@ -18,6 +18,14 @@ module.exports.policies = {
   // (`true` allows public access) 
   '*': true,
 
+  LobbyController: {
+    '*': 'hasPlayerSession'
+  },
+
+  GameController: {
+    '*': 'hasPlayerSession'
+  }
+
   /*
 	// Here's an example of adding some policies to a controller
 	RabbitController: {

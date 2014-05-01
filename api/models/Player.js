@@ -13,13 +13,9 @@
       required: true,
       isValidName: true
     },
-    serverUser: {
-      type: 'string',
+    isServer: {
+      type: 'boolean',
       defaultsTo: false
-    },
-    isOnline: {
-      type: 'string',
-      defaultsTo: true
     }
   }
 
@@ -38,6 +34,12 @@
   $.toggleStatus = function () {
     this.isOnline = !this.isOnline;
     this.save();
+  }
+
+  $.getName = function (playerId) {
+    return Player.findOneBy(playerId).then(function (player) {
+      return player.name
+    })
   }
 
 })(module.exports)

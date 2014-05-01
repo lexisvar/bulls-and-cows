@@ -1,16 +1,19 @@
-module.exports = {
+(function ($) {
 
-  getGames: function (req, res) {
-    Game.find()
-  },
+  $.getGames = function (req, res) {
+    Game.findOpenMultiplayerGames(
+      function (errors, results) {
 
-  getModes: function (req, res) {
+      });
+  }
+
+  $.getModes = function (req, res) {
     return res.json({
       modes: GameModeService.getModes()
     });
-  },
+  }
 
-  newGame: function (req, res) {
+  $.newGame = function (req, res) {
     if (undefined !== req.session.currentGame) {
       return res.json({
         error: 'You have already started another game',
@@ -37,9 +40,9 @@ module.exports = {
           gameId: game.id
         });
       });
-  },
+  }
 
-  guessNumber: function (req, res) {
+  $.guessNumber = function (req, res) {
     var gameId = req.param('gameId') || req.session.currentGame;
 
     return Game.findOneById(gameId).exec(
@@ -82,4 +85,4 @@ module.exports = {
       });
   }
 
-};
+})(module.exports);

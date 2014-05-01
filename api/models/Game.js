@@ -20,7 +20,7 @@
     },
     guestPlayerId: {
       type: 'integer',
-      required: true
+      defaultsTo: null
     },
 
     // SECRET NUMBERS
@@ -29,8 +29,7 @@
       required: true
     },
     guestSecret: {
-      type: 'integer',
-      required: true
+      type: 'integer'
     },
 
     // STATE FLAGS
@@ -71,4 +70,23 @@
     if (this.isMultiplayer)
       this.hostTurn = !this.hostTurn;
   };
+
+  $.findOpenMultiplayerGames = function (callback) {
+    return Game.find({
+      isMultiplayer: true,
+      isOver: false,
+      guestPlayerId: null
+    }).then(function (games) {
+      var x, game, data = [],
+        name;
+
+      for (x in games) {
+        game = games[x];
+        games[x].hostName = Player.getName(game.hostUserId);
+      }
+
+      callback.call(null, games);
+    });
+  }
+
 })(module.exports);
