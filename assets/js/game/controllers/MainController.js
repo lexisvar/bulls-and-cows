@@ -7,7 +7,7 @@ angular.module('BullsAndCows').controller('MainController', ['$scope', 'Server',
      */
     return Server.applyPlayerInfo(
       function hasIdCallback(response) {
-        if (null !== response.currentGame) {
+        if (null !== response.game) {
           $location.path('/game');
         }
         $root.appIsLoaded();

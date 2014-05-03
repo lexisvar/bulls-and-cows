@@ -19,11 +19,13 @@ module.exports.policies = {
   '*': true,
 
   LobbyController: {
-    '*': 'hasPlayerSession'
+    '*': true
+    //    '*': 'hasPlayerSession'
   },
 
   GameController: {
-    '*': 'hasPlayerSession'
+    '*': true
+    //'*': 'hasPlayerSession'
   }
 
   /*

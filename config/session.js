@@ -1,7 +1,7 @@
 /**
  * Session
- * 
- * Sails session integration leans heavily on the great work already done by Express, but also unifies 
+ *
+ * Sails session integration leans heavily on the great work already done by Express, but also unifies
  * Socket.io with the Connect session store. It uses Connect's cookie parser to normalize configuration
  * differences between Express and Socket.io and hooks into Sails' middleware interpreter to allow you
  * to access and auto-save to `req.session` with Socket.io the same way you would with Express.
@@ -15,7 +15,7 @@ module.exports.session = {
   // Session secret is automatically generated when your new app is created
   // Replace at your own risk in production-- you will invalidate the cookies of your users,
   // forcing them to log in again. 
-  secret: '47222efc0c2a07facdda6a3b1f5333cc'
+  secret: '47222efc0c2a07facdda6a3b1f5333cc',
 
 
   // In production, uncomment the following lines to set up a shared redis session store
@@ -32,6 +32,13 @@ module.exports.session = {
   // db: 0,
   // pass: <redis auth password>
   // prefix: 'sess:'
+
+  adapter: 'redis',
+  host: 'localhost',
+  port: 6379,
+  ttl: 3600,
+  db: 0,
+  prefix: 'sess:'
 
 
   // Uncomment the following lines to use your Mongo adapter as a session store

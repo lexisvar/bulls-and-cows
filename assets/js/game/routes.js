@@ -12,6 +12,10 @@ angular.module('BullsAndCows').config([
         controller: 'LobbyController',
         templateUrl: 'templates/lobby.html'
       })
+      .when('/game', {
+        controller: 'GameController',
+        templateUrl: 'templates/game.html'
+      })
       .otherwise({
         redirectTo: '/'
       });

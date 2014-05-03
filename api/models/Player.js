@@ -1,4 +1,5 @@
 (function ($) {
+
   $.autoCreatedAt = true;
   $.autoUpdatedAt = false;
 
@@ -34,12 +35,6 @@
   $.toggleStatus = function () {
     this.isOnline = !this.isOnline;
     this.save();
-  }
-
-  $.getName = function (playerId) {
-    return Player.findOneBy(playerId).then(function (player) {
-      return player.name
-    })
   }
 
 })(module.exports)

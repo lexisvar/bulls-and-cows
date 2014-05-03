@@ -1,84 +1,62 @@
 var scope;
-angular.module('BullsAndCows').controller('LobbyController', ['$scope', '$socket', '$location', 'PlayModes',
-  function ($scope, $socket, $location, Modes) {
-
-    $scope.games = [{
-      id: 1,
-      name: "Somebody's game",
-      player: "Andrew",
-      mode: "PvP"
-    }, {
-      id: 2,
-      name: "Another game",
-      player: 'Johnny',
-      mode: "Co-op"
-    }];
-
+angular.module('BullsAndCows').controller('LobbyController', [
+  '$scope', 'Server', '$location', 'PlayModes',
+  function ($scope, Server, $location, Modes) {
+    scope = $scope
     $scope.config = {
-      modeSelected: null,
-      showGameDialog: null,
-      selectedGameId: null,
-      playModes: Modes.all
+      playMode: undefined,
+      gameId: undefined,
+      showGameDialog: false,
+      joinDisabled: true,
+      startDisabled: true,
+      showTitleInput: false,
+      showNumberInput: false,
+      playModes: Modes.all,
+      title: '',
+      secret: ''
     }
 
+    $scope.games = {}
 
-    /*
-    // register/unregister listeners
-    (function () {
-      // update game list callback
-      var updateGameList = function (res) {
+    Server.joinLobby(function (games) {
+      $scope.games = games;
+    });
 
-      }
+    $scope.$on('$destroy', function () {
+      Server.leaveLobby();
+    })
 
-      // subscribe for listener and get current data
-      $socket.get('/lobby/join', null, function (res) {
-        // register listener
-        $socket.on('update', updateGameList);
-        updateGameList(res);
-      });
-
-      // unregister listener on $scope.$destroy
-      $scope.$on('$destroy', function () {
-        $socket.removeListener('update', updateGameList);
-      });
-    })();*/
-
-
-    $scope.selectGameToJoin = function (gameId) {
-      $scope.selectedGameId = $scope.selectedGameId === gameId ? null : gameId;
+    $scope.selectGame = function (gameId) {
+      $scope.gameId = $scope.gameId === gameId ? undefined : gameId;
+      $scope.config.joinDisabled = undefined === $scope.gameId ? true : false;
     }
 
     $scope.isCurrentlySelectedGame = function (gameId) {
-      return gameId === $scope.config.selectedGameId;
+      return gameId === $scope.config.gameId;
     }
 
     $scope.toggleGameDialogue = function () {
       $scope.config.showGameDialog = !$scope.config.showGameDialog;
     }
 
-    $scope.getGameModes = function () {
-      return $scope.config.playModes;
-    }
-
-    $scope.isJoinDisabled = function () {
-      return $scope.config.selectedGameId === null;
-    }
-
-    $scope.setPlayMode = function (gameMode) {
-      $scope.config.modeSelected = gameMode;
-    }
-
     $scope.startGame = function () {
-      if (undefined === $scope.gameModes[$scope.modeSelected]) {
+      if (Modes.isValid($scope.config.playMode)) {
         alert('You need to select a valid game mode');
         return false;
       }
 
-      $location.path('/game');
+      Server.createGame($scope.config,
+        function done() {
+          $location.path('/game');
+        })
     }
 
-    $scope.isStartDisabled = function () {
-      return $scope.modeSelected === null;
+    $scope.selectPlayMode = function () {
+      var mode = Modes.get($scope.config.playMode);
+
+      $scope.config.startDisabled = false;
+      $scope.config.showTitleInput = mode.isMultiplayer ? true : false;
+      $scope.config.showNumberInput = (mode.isMultiplayer && !mode.isCooperative) ? true : false;
     }
 
     $scope.hasGames = function () {

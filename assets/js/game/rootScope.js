@@ -1,15 +1,18 @@
 angular.module('BullsAndCows').run(['$rootScope', '$timeout',
   function ($root, $timeout) {
     $root.playerData = {
-      playerId: null,
-      playerName: null,
-      currentGame: null
+      id: null,
+      name: null,
+      game: null,
+      isHost: null
     }
 
     $root.flags = {
       showLoading: true,
       appLoaded: false
     }
+
+    $root.games = {}
 
     var hideLoadingTimeout = 500;
     var dontApplyWhen = ['$apply', '$digest'];
@@ -32,11 +35,11 @@ angular.module('BullsAndCows').run(['$rootScope', '$timeout',
     }
 
     $root.hasPlayerId = function () {
-      return $root.playerData.playerId ? true : false;
+      return $root.playerData.id ? true : false;
     }
 
     $root.getPlayerName = function () {
-      return $root.playerData.playerName;
+      return $root.playerData.name;
     }
 
     $root.getPlayerData = function (callback) {

@@ -165,7 +165,7 @@
 
   // if exports is defined
   if ('object' === typeof exports) {
-    exports = $;
+    return $;
   }
   // if angular is defined
   else if ('object' === typeof angular) {
@@ -178,4 +178,9 @@
     window['BullsAndCows_Game'] = $;
   }
 
-})({});
+})((function () {
+  if ('undefined' === typeof module || 'undefined' === typeof module.exports)
+    return {}
+
+  return module.exports
+})());

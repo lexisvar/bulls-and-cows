@@ -16,11 +16,14 @@
     var messages = {}, message, argument;
 
     for (argument in errors.ValidationError) {
+      // if error messages are defined within the scope of the Model
       if (undefined !== obj.errorMessages && undefined !== obj.errorMessages[argument]) {
         messages[argument] = obj.errorMessages[argument];
-      } else {
+      }
+      // otherwise return the messages provilded from Sails
+      else {
         messages[argument] = [];
-        obj.errorMessages[argument].forEach(function (error) {
+        errors.ValidationError[argument].forEach(function (error) {
           messages[argument].push(error.message);
         })
       }

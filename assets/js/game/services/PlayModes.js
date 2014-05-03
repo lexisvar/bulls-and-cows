@@ -1,25 +1,60 @@
 angular.module('BullsAndCows').service('PlayModes', function () {
   var $ = {};
 
-  playMode = function (title, isMultiplayer, isCooperative, isWithBot) {
-    return {
-      title: title,
-      isMultiplayer: isMultiplayer,
-      isCooperative: isCooperative,
-      isWithBot: isWithBot
+  /**
+   * Static definition of all play modes with their
+   * specific Game configuration
+   * @type {Object}
+   */
+  $.all = {
+    singlePlayer: {
+      title: 'Play vs PC',
+      isMultiplayer: false,
+      isCooperative: false,
+      isWithBot: false
+    },
+    singlePlayerCoopWithBot: {
+      title: 'Co-op with Bot vs PC',
+      isMultiplayer: false,
+      isCooperative: true,
+      isWithBot: true
+    },
+    singlePlayerWithBot: {
+      title: 'Bot vs PC',
+      isMultiplayer: false,
+      isCooperative: false,
+      isWithBot: true
+    },
+    multiplayerCoop: {
+      title: 'Co-op with Player vs PC',
+      isMultiplayer: true,
+      isCooperative: true,
+      isWithBot: false
+    },
+    multiplayerPvP: {
+      title: 'Player vs Player',
+      isMultiplayer: true,
+      isCooperative: false,
+      isWithBot: false
     }
   }
 
-  $.all = {
-    singlePlayer: playMode('Play vs PC', false, false, false),
-    singlePlayerCoopWithBot: playMode('Co-op with Bot vs PC', false, true, true),
-    singlePlayerWithBot: playMode('Bot vs PC', false, false, true),
-    multiplayerCoop: playMode('Co-op with Player vs PC', true, true, false),
-    multiplayerPvP: playMode('Player vs Player', true, false, false)
+  /**
+   * A mode accessor by Id
+   * @param  {string} modeId The name of the play mode
+   * @return {[type]}        [description]
+   */
+  $.get = function (modeId) {
+    return $.all[modeId];
   }
 
-  $.getById = function (modeId) {
-    return $.all[modeId] || {}
+  /**
+   * Checks if a specific modeId is a valid play mode
+   * @param  {string}  modeId The name of the play mode
+   * @return {Boolean}        Return true if a valid mode
+   */
+  $.isValid = function (modeId) {
+    return undefined !== $.all[modeId];
   }
 
   return $;

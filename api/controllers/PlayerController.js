@@ -8,8 +8,8 @@
    * and dispatch the session info back to the frontend
    */
   $.register = function (req, res) {
-    if (Session.hasPlayerSession(req))
-      return req.json(Session.getInfo(req));
+    if (Session.hasSession(req))
+      return res.json(Session.get(req));
 
     Player.create({
       name: req.param('name')
@@ -20,8 +20,8 @@
             errors: Errors.format(Player, errors)
           });
         }
-        Session.setPlayerInfo(req, entity);
-        return res.json(Session.getInfo(req));
+        Session.setInfo(req, entity);
+        return res.json(Session.get(req));
       });
   }
 
@@ -30,7 +30,7 @@
    * would handle empty session states and return them as null
    */
   $.get = function (req, res) {
-    return res.json(Session.getInfo(req));
+    return res.json(Session.get(req));
   }
 
   /**
@@ -44,7 +44,7 @@
   }
 
   $.server = function (req, res) {
-    res.json(ServerPlayer.get('id'));
+    res.json(Engine);
   }
 
 })(module.exports);
