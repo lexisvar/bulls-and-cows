@@ -1,5 +1,5 @@
-angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope',
-  function ($socket, $root) {
+angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope', 'PlayModes',
+  function ($socket, $root, PlayModes) {
     var $ = {};
 
     /**
@@ -49,7 +49,7 @@ angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope',
      */
     $.getPlayer = function (callback) {
       $root.showLoading();
-      $socket.get('/player/get', {}, function (response) {
+      $socket.get('/player/get', function (response) {
         $root.hideLoading();
         return handleResponse(response, callback);
       });
@@ -83,7 +83,7 @@ angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope',
      * @param  {Function} callback
      */
     $.joinLobby = function (callback) {
-      $socket.get('/lobby/join', null, function (response) {
+      $socket.get('/lobby/join', function (response) {
         callback.call(null, response);
       })
     }
@@ -94,6 +94,12 @@ angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope',
      */
     $.leaveLobby = function () {
       $socket.get('/lobby/leave');
+    }
+
+    $.createGame = function (data, successCallback, errorHandler) {
+      $socket.get('/game/create', data, function (response) {
+        return handleResponse(response, successCallback, errorHandler)
+      })
     }
 
     return $;

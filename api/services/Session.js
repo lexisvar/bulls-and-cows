@@ -40,12 +40,18 @@
     return req.session.game || null;
   }
 
+  /**
+   * Set session game params from game entity
+   * @param {object} req  Request object
+   * @param {object} game Optional game entity
+   */
   $.setGame = function (req, game) {
+    // if game is null -> destroy game params
     if (game === null) {
-      return req.session.currentGame = req.session.isHost = null;
+      return req.session.game = req.session.isHost = null;
     }
 
-    req.session.game = gameId;
-    req.session.isHost = game.hostPlayerId === req.session.playerId
+    req.session.game = game.id;
+    req.session.isHost = game.hostPlayerId === req.session.playerId;
   }
 })(module.exports)

@@ -57,5 +57,23 @@ angular.module('BullsAndCows').service('PlayModes', function () {
     return undefined !== $.all[modeId];
   }
 
+  /**
+   * Formats an object for a "new game" request
+   * @param  {string} mode   The id of the play mode
+   * @param  {string} title  Game title
+   * @param  {string} secret Host secret
+   * @return {object}       Formatted game request object
+   */
+  $.formatGameObject = function (mode, title, secret) {
+    var mode = $.get(mode);
+    return {
+      title: title,
+      secret: secret,
+      isMultiplayer: mode.isMultiplayer,
+      isWithBot: mode.isWithBot,
+      isCooperative: mode.isCooperative
+    }
+  }
+
   return $;
 });

@@ -1,5 +1,5 @@
 (function ($) {
-  var announceNewGame = function (game) {
+  var announceNewGame = function (game, socketExclude) {
     if (game.isMultiplayer) {
       Player
         .findOne(game.hostPlayerId)
@@ -8,9 +8,8 @@
             id: game.id,
             title: game.title,
             host: player.name,
-            isMultiplayer: true,
             isCooperative: game.isCooperative
-          })
+          }, socketExclude);
         });
     }
   }
@@ -74,23 +73,24 @@
   }
 
   $.create = function (req, res) {
-    if (null !== Session.getGame(req)) {
+    /*if (null !== Session.getGame(req)) {
       return res.json({
         error: 'You can play only one game at a time'
       })
-    }
+    }*/
 
-    Game.newGame(req, function (errors, game) {
-      if (errors) {
-        return res.json({
-          errors: Errors.format(Game, errors)
-        });
-      }
+    Game.newGame(req.params.all(), Session.get(req),
+      function (errors, game) {
+        if (errors) {
+          return res.json({
+            errors: Errors.format(Game, errors)
+          });
+        }
 
-      announceNewGame(game);
-      Session.setGame(req, game);
-      return res.json(game.toJSON());
-    });
+        announceNewGame(game, req.socket);
+        Session.setGame(req, game);
+        return res.json(game.toJSON());
+      });
   }
 
   $.join = function (req, res) {

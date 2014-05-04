@@ -11,12 +11,12 @@ angular.module('BullsAndCows', [])
 
     this.$get = function () {
       return {
-        socket: window.socket,
-        get: window.socket.get,
-        post: window.socket.post,
-        put: window.socket.put,
-        'delete': window.socket['delete'],
-        request: window.socket.request,
+        socket: socket,
+        get: socket.get,
+        post: socket.post,
+        put: socket.put,
+        'delete': socket['delete'],
+        request: socket.request,
         io: window.io
       }
     }
@@ -27,7 +27,7 @@ angular.module('BullsAndCows', [])
      *    `socket.get('/user/3', Stats.populate)`
      *
      * @param {String} url    ::    destination URL
-     * @param {Object} params ::    parameters to send with the request [optional]
+     * @param {Object1} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
     socketClass.prototype.get = function (url, data, cb) {

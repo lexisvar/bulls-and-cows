@@ -89,7 +89,6 @@
     if (null !== values.title)
       values.title = values.title.trim();
 
-
     if (this.isMultiplayer)
       values.hostTurn = Math.random() > 0.5;
 
@@ -106,53 +105,81 @@
     this.save();
   }
 
-  var formatNewGameData = function (req) {
+  $.newGame = function (params, session, callback) {
+    var data;
 
-
-    return {
-      isMultiplayer: req.param('isMultiplayer') || false,
-      isWithBot: req.param('isWithBot') || false,
-      isCooperative: req.param('isCooperative') || false,
-      hostPlayerId: hostPlayerId,
-      title: title,
-      hostSecret: hostSecret
-    }
-  }
-
-  $.newGame = function (req, callback) {
-    var multiplayer = req.param('isMultiplayer'),
-      session = Session.get(req),
+    // if a Multiplayer game
+    if (params['isMultiplayer']) {
       data = {
-        isMultiplayer: multiplayer || false,
-        isWithBot: req.param('isWithBot') || false,
-        isCooperative: req.param('isCooperative') || false,
-        hostSecret: multiplayer ? req.param('secret') : Engine.pickRandom(),
-        hostPlayerId: multiplayer ? ServerPlayer.get('id') : session.id,
-        guestPlayerId: multiplayer ? null : session.id,
-        title: multiplayer ? req.param('title') : null
-      };
+        isMultiplayer: true,
+        isCooperative: params['isCooperative'] || false,
+        hostSecret: !params['isCooperative'] ? params['secret'] : Engine.pickRandom(),
+        hostPlayerId: session.id,
+        title: params['title'] || -1 // some modifications to trigger title validator        
+      }
+    }
+    // if a single player game vs Server
+    else {
+      data = {
+        isWithBot: params['isWithBot'] || false,
+        isCooperative: params['isCooperative'] || false,
+        hostSecret: Engine.pickRandom(),
+        hostPlayerId: ServerPlayer.get('id'),
+        guestPlayerId: session.id
+      }
+    }
 
-    Game
+    return this
       .create(data)
       .done(callback);
   }
 
   $.findOpenMultiplayerGames = function (callback) {
-    return Game.find({
-      isMultiplayer: true,
-      isOver: false,
-      guestPlayerId: null
-    }).then(function (games) {
-      var x, game, data = [],
-        name;
-
-      for (x in games) {
-        game = games[x];
-        games[x].hostName = Player.getName(game.hostUserId);
+    var i, match, hostId, hosts = [],
+      findBy = {
+        isMultiplayer: true,
+        isOver: false,
+        guestPlayerId: null
       }
 
-      callback.call(null, games);
-    });
+    return this
+      .find(findBy)
+      .then(function (games) {
+        for (i in games) {
+          hostId = games[i].hostPlayerId;
+          if (hosts.indexOf(hostId) === -1)
+            hosts.push(hostId);
+        }
+        //console.log(games[0]);
+        return Player
+          .find({
+            id: hosts
+          })
+          .then(function (players) {
+            var game, sorted = [];
+
+            // sort players data in an array based on their playerId
+            for (i in players) {
+              sorted[players[i].id] = players[i].name;
+            }
+
+            // premare games object by formatting a host name and
+            // deleting values that are either not required or should be
+            // hidden
+            for (i in games) {
+              game = games[i];
+              game.host = sorted[game.hostPlayerId];
+              delete game.hostSecret;
+              delete game.hostPlayerId;
+              delete game.guestPlayerId;
+              delete game.hostTurn;
+              delete game.hostTurn;
+              delete game.isWithBot;
+            }
+
+            return callback.call(null, games);
+          })
+      });
   }
 
 })(module.exports);

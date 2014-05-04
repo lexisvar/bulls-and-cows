@@ -3,9 +3,11 @@
   $.join = function (req, res) {
     var currentGame = Session.getGame(req);
     if (null !== currentGame) {
-      return res.redirect('/game/enter');
+      // return res.redirect('/game/enter');
     }
 
+    console.log('Subscribing...');
+    // unsubscribe first, to prevent double subscription
     Game.unsubscribe(req.socket);
     Game.subscribe(req.socket);
 
