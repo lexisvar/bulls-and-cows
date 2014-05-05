@@ -1,72 +1,52 @@
 (function ($) {
+
   var announceNewGame = function (game, socketExclude) {
     if (game.isMultiplayer) {
-      Player
-        .findOne(game.hostPlayerId)
-        .exec(function (errors, player) {
-          Game.publishCreate({
-            id: game.id,
-            title: game.title,
-            host: player.name,
-            isCooperative: game.isCooperative
-          }, socketExclude);
-        });
+      Player.getNames(game.hostId,
+        function (player) {
+          game.host = player.name;
+          return Game.publishCreate(Game.secure(game), socketExclude);
+        })
     }
   }
 
   $.enter = function (req, res) {
-    var gameId = Session.getGame(req);
-    if (null === gameId) {
-      return res.redirect('/lobby/join');
-    }
+    var session = Session.get(req);
 
     Game.unsubscribe(req.socket);
-    Game
-      .findOne(gameId)
-      .then(function (errors, game) {
-        if (true === game.isOver) {
-          Session.setGame(null);
-          return res.redirect('/lobby/join')
-        }
+    GameTurn.unsubscribe(req.socket);
 
-        Game.subscribe(req.socket, game);
+    Game.getWithTurns(session.game,
+      function (game) {
+        Game.secure(game);
+        GameTurn.subscribe(req.socket, game.id);
+        return res.json(game)
       })
   }
 
   $.turn = function (req, res) {
-    var session = Session.getInfo(req),
-      guess = param('guess');
+    var session = Session.get(req);
 
-    if (null === session.game) {
-      return res.redirect('/lobby/join');
-    }
-
-    if (!Engine.isValidNumber(guess)) {
-      return res.json({
-        error: '"' + guess + '" is not a valid number!'
-      });
-    }
-
-    GameTurn.playTurn(guess, session,
+    GameTurn.playTurn(param('guess'), session,
       function success(game, turn) {
-        if (turn.bulls === 4) {
-          return res.json({
-            message: 'You won the game'
-          })
-        }
+        GameTurn.publishUpdate({
+          id: game.id,
+          action: 'turn',
+          turn: turn
+        }, req.socket)
+
+        return res.json(turn);
       },
       function fail(game) {
         if (true === game.isOver) {
           return res.json({
-            message: 'The game is over',
-            state: 'over'
+            error_over: true
           })
         }
 
-        if (session.isHost === game.hostTurn) {
+        if ((session.isHost && !game.hostTurn) || (!session.isHost && game.hostTurn)) {
           return res.json({
-            message: 'It is not your turn to play!',
-            state: 'not_your_turn'
+            error_turn: true
           })
         }
       });
@@ -79,7 +59,9 @@
       })
     }*/
 
-    Game.newGame(req.params.all(), Session.get(req),
+    Game.newGame(
+      req.params.all(),
+      Session.get(req),
       function (errors, game) {
         if (errors) {
           return res.json({
@@ -89,7 +71,9 @@
 
         announceNewGame(game, req.socket);
         Session.setGame(req, game);
-        return res.json(game.toJSON());
+        Game.secure(game);
+
+        return res.json(game);
       });
   }
 
@@ -97,22 +81,24 @@
     Game
       .findOne(req.param('id'))
       .then(function (errors, game) {
-        if (undefined === game || game.guestPlayerId) {
+        if (undefined === game || game.guestId) {
           return res.json({
-            error: 'The game was not found or is already full'
+            error_game: true
           });
         }
 
-        game.guestPlayerId = Session.getPlayerId(req);
+        game.guestId = Session.get(req, 'id');
         game.guestSecret = param('secret');
-        game.save(function (errors, result) {
+
+        game.save(function (errors, game) {
           if (errors) {
             return res.json({
               errors: Errors.format(Game, errors)
             })
           }
 
-          return res.json(result);
+          Session.setGame(req, game);
+          return res.json(game);
         });
       });
   }

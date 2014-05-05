@@ -73,10 +73,9 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
       return Server.createGame(data,
         function success(response) {
-          console.log('Success:', response)
+          $root.game = response;
         },
         function fail(errors) {
-          console.log(errors);
           $scope.$apply(function () {
             $scope.game.errors = errors;
           })
@@ -98,7 +97,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
     }
 
     $scope.joinGame = function () {
-
+      Server.joinGame($scope.lobby.gameId);
     }
   }
 ]);

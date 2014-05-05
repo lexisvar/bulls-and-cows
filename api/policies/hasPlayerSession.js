@@ -1,5 +1,5 @@
 module.exports = function (req, res, next) {
-  if (Session.hasPlayerSession(req))
+  if (Session.hasSession(req))
     return next();
 
   return res.json({

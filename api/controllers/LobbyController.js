@@ -6,12 +6,11 @@
       // return res.redirect('/game/enter');
     }
 
-    console.log('Subscribing...');
     // unsubscribe first, to prevent double subscription
     Game.unsubscribe(req.socket);
     Game.subscribe(req.socket);
 
-    Game.findOpenMultiplayerGames(function (games) {
+    Game.findOpenGames(function (games) {
       return res.json(games);
     })
   }

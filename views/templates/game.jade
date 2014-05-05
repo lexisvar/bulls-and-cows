@@ -1,4 +1,19 @@
-div.waiting(ng-show="config.showWaiting")
+div.waiting(ng-show="game.isWaiting")
   | Waiting for a player to join the game
-form.guess
-  input(type="text" model="data.guess")
+div.game(ng-show="!game.isWaiting")
+  div.host
+    h3 {{$root.game.host.name}}
+    ul.turns
+      li(ng-repeat="turn in $root.game.host.turns")
+        | Guess: {{turn.guess}}
+        | Cows: {{turn.cows}} Bulls: {{turn.bulls }}
+  div.guest
+    h3 {{$root.game.guest.name}}
+    ul.turns
+      li(ng-repeat="turn in $root.game.guest.turns")
+        div.cow(ng-repeat="n in [] | range: turn.cows") cow
+        div.cow(ng-repeat="n in [] | range: turn.bulls") bull
+
+  form.guess(ng-class="{host: $root.isHost}")
+    input(type="text" model="data.guess")
+    button(type="submit" ng-disabled="!$root.player.hasTurn") Guess!

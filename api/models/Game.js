@@ -1,5 +1,4 @@
 (function ($) {
-
   $.autoCreatedAt = false;
   $.autoUpdatedAt = false;
 
@@ -22,11 +21,11 @@
     },
 
     // PLAYERS ID
-    hostPlayerId: {
+    hostId: {
       type: 'integer',
       required: true
     },
-    guestPlayerId: {
+    guestId: {
       type: 'integer',
       defaultsTo: null
     },
@@ -86,7 +85,7 @@
   };
 
   $.beforeCreate = function (values, next) {
-    if (null !== values.title)
+    if (undefined !== values.title)
       values.title = values.title.trim();
 
     if (this.isMultiplayer)
@@ -95,9 +94,12 @@
     next();
   };
 
-  $.toggleTurn = function () {
+  $.toggleTurn = function (doSave) {
     if (this.isMultiplayer)
       this.hostTurn = !this.hostTurn;
+
+    if (true === doSave)
+      this.save();
   };
 
   $.over = function () {
@@ -111,21 +113,21 @@
     // if a Multiplayer game
     if (params['isMultiplayer']) {
       data = {
+        title: params['title'] || -1, // some modifications to trigger title validator        
+        hostId: session.id,
+        hostSecret: !params['isCooperative'] ? params['secret'] : Engine.pickRandom(),
         isMultiplayer: true,
         isCooperative: params['isCooperative'] || false,
-        hostSecret: !params['isCooperative'] ? params['secret'] : Engine.pickRandom(),
-        hostPlayerId: session.id,
-        title: params['title'] || -1 // some modifications to trigger title validator        
       }
     }
     // if a single player game vs Server
     else {
       data = {
+        hostId: ServerPlayer.get('id'),
+        guestId: session.id,
+        hostSecret: Engine.pickRandom(),
         isWithBot: params['isWithBot'] || false,
         isCooperative: params['isCooperative'] || false,
-        hostSecret: Engine.pickRandom(),
-        hostPlayerId: ServerPlayer.get('id'),
-        guestPlayerId: session.id
       }
     }
 
@@ -134,52 +136,77 @@
       .done(callback);
   }
 
-  $.findOpenMultiplayerGames = function (callback) {
-    var i, match, hostId, hosts = [],
-      findBy = {
-        isMultiplayer: true,
-        isOver: false,
-        guestPlayerId: null
+  $.getUniqueKeys = function (values, keys) {
+    var value, uniques = [];
+
+    if (!(values instanceof Array)) {
+      values = [values];
+    }
+
+    for (var i in values) {
+      for (var key in keys) {
+        value = values[i][key];
+        if (uniques.indexOf(value) !== -1)
+          uniques.push(value);
       }
+    }
 
-    return this
-      .find(findBy)
-      .then(function (games) {
-        for (i in games) {
-          hostId = games[i].hostPlayerId;
-          if (hosts.indexOf(hostId) === -1)
-            hosts.push(hostId);
-        }
-        //console.log(games[0]);
-        return Player
-          .find({
-            id: hosts
-          })
-          .then(function (players) {
-            var game, sorted = [];
-
-            // sort players data in an array based on their playerId
-            for (i in players) {
-              sorted[players[i].id] = players[i].name;
-            }
-
-            // premare games object by formatting a host name and
-            // deleting values that are either not required or should be
-            // hidden
-            for (i in games) {
-              game = games[i];
-              game.host = sorted[game.hostPlayerId];
-              delete game.hostSecret;
-              delete game.hostPlayerId;
-              delete game.guestPlayerId;
-              delete game.hostTurn;
-              delete game.hostTurn;
-              delete game.isWithBot;
-            }
-
-            return callback.call(null, games);
-          })
-      });
+    return uniques;
   }
 
+  $.secure = function (games) {
+    if (!(games instanceof Array)) {
+      games = [games];
+    }
+
+    for (var x in games) {
+      delete games[x].hostSecret;
+      delete games[x].guestSecret;
+    }
+
+    return games;
+  }
+
+  $.getWithNames = function (where, callback) {
+    var single = 'number' === typeof where ? true : false;
+
+    return this
+      .find(where)
+      .then(function (games) {
+        var ids = $.filterUniqueKeys(games, ['hostPlayerId', 'guestPlayerId']);
+        Player.findNames(ids, function (players) {
+          var i, game;
+          for (i in games) {
+            game = games[i];
+            game.host = players[game.hostId];
+            game.guest = players[game.guestId];
+          }
+
+          return callback.call(null, single ? games[i] : games);
+        })
+      })
+  }
+
+  $.findOpenGames = function (callback) {
+    var where = {
+      isMultiplayer: true,
+      isOver: false,
+      guestPlayerId: null
+    }
+    return this.getWithNames(where, callback);
+  }
+
+  $.getWithTurns = function (gameId, callback) {
+    return Game.getWithNames(gameId,
+      function (errors, game) {
+        GameTurn
+          .find({
+            gameId: game.id
+          })
+          .then(function (turns) {
+            game.turns = turns;
+            return callback.call(null, game);
+          })
+      })
+  }
 })(module.exports);

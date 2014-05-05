@@ -24,6 +24,8 @@ module.exports = function (grunt) {
     'js/game/templates.js',
     'js/game/config.js',
     'js/game/routes.js',
+    'js/game/rootScope/Main.js',
+    'js/game/rootScope/*.js',
     'js/game/directives/*.js',
     'js/game/factories/*.js',
     'js/game/services/*.js',

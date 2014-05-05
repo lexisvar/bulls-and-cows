@@ -37,4 +37,25 @@
     this.save();
   }
 
+  $.getNames = function (where, callback) {
+    var single = 'number' === typeof where ? true : false;
+
+    return Player
+      .find({
+        id: where
+      })
+      .exec(function (err, names) {
+        var data = [];
+        if (!(names instanceof Array)) {
+          names = [names];
+        }
+
+        for (var i in names) {
+          data[names[i].id] = names[id].name;
+        }
+
+        return callback.call(null, single ? data[i] : data);
+      });
+  }
+
 })(module.exports)

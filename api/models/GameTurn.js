@@ -4,7 +4,7 @@
   $.autoUpdatedAt = false;
 
   $.errorMessages = {
-    guess: 'Guess is not a valid "Bulls and Cows" number'
+    guess: 'Your guess is not a valid "Bulls and Cows" number'
   }
 
   $.attributes = {
@@ -20,7 +20,7 @@
 
     guess: {
       type: 'integer',
-      gameNumber: true,
+      isValidGameNumber: true,
       required: true,
     },
 
@@ -32,6 +32,11 @@
     cows: {
       type: 'integer',
       required: true
+    },
+
+    isWinning: {
+      type: 'boolean',
+      defaultsTo: false
     }
   }
 
@@ -41,8 +46,14 @@
     }
   }
 
-  $.afterCreate = function () {
-    $.updateCount(new Game(this.gameId));
+  $.beforeCreate = function (values, next) {
+    values.isWinning = values.bulls === 4 ? true : false;
+    next();
+  }
+
+  $.afterCreate = function (record, next) {
+    $.updateCount(new Game(record.gameI));
+    next();
   }
 
   $.toJSON = function () {
