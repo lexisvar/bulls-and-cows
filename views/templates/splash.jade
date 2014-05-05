@@ -7,12 +7,12 @@
   form(ng-submit="registerPlayer()")
     p.error(ng-show="showError()") {{state.error}}
     label(for="player-name") Enter name:
-      input(id="player-name" ng-model="state.name")
+      input(id="player-name" ng-model="state.name" ng-class="{error: showError()}")
     button(type="submit") OK
 
 // Welcome message
 .welcomeMessage(ng-show="state.showWelcome")
-  h1 Hey, {{$root.playerData.name}}
+  h1 Hey, {{$root.player.name}}
   div(ng-switch="state.isReturning")
     h3(ng-switch-when="true")
       | Welcome Back!

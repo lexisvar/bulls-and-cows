@@ -1,5 +1,6 @@
-angular.module('BullsAndCows').controller('MainController', ['$scope', 'Server', '$location', '$rootScope',
-  function ($scope, Server, $location, $root) {
+angular.module('BullsAndCows').controller('FrontController', [
+  '$scope', '$rootScope', '$location', 'Server',
+  function ($scope, $root, $location, Server) {
 
     /**
      * Test to see if we can identify the user, otherwise
@@ -8,7 +9,9 @@ angular.module('BullsAndCows').controller('MainController', ['$scope', 'Server',
     return Server.applyPlayerInfo(
       function hasIdCallback(response) {
         if (null !== response.game) {
-          //$location.path('/game');
+          Server.gameEnter(function () {
+            $location.path('/game');
+          })
         }
         $root.appIsLoaded();
       },

@@ -38,23 +38,21 @@
   }
 
   $.getNames = function (where, callback) {
-    var single = 'number' === typeof where ? true : false;
-
     return Player
       .find({
         id: where
       })
-      .exec(function (err, names) {
+      .exec(function (err, players) {
         var data = [];
-        if (!(names instanceof Array)) {
-          names = [names];
+        if (!(players instanceof Array)) {
+          players = [players];
         }
 
-        for (var i in names) {
-          data[names[i].id] = names[id].name;
+        for (var i in players) {
+          data[players[i].id] = players[i].name;
         }
 
-        return callback.call(null, single ? data[i] : data);
+        return callback.call(null, data);
       });
   }
 

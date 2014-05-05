@@ -12,23 +12,22 @@ angular.module('BullsAndCows').run([
       switch (message.model) {
       case 'game':
         if ('create' === message.verb)
-          return $root.addGame(message.data);
+          return $root.lobbyAddGame(message.data);
 
         if ('destroy' === message.verb)
-          return $root.removeGame(message.data);
+          return $root.lobbyRemoveGame(message.data);
 
         if ('update' === message.verb) {
-          if (true === message.data.start) {
+          if ('start' === message.data.action) {
             return $root.gameStart(message.data);
-          } else if (true === message.data.unsubscribe) {
-            return $root.resetGames();
+          } else if ('unsubscribe' === message.data.action) {
+            return $root.lobbyReset();
           }
         }
 
         break;
       case 'gameTurn':
-        if ('create' === message.verb)
-          return $root.addTurn(message.data);
+        return $root.addTurn(message.data);
       }
     });
 

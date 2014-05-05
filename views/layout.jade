@@ -10,7 +10,7 @@ html
   - /* includes CSS Styles */
   include _meta/styles
   block styles
-  body(ng-app="BullsAndCows" ng-controller="MainController")
+  body(ng-app="BullsAndCows" ng-controller="FrontController")
     section(ng-view ng-show="$root.flags.appLoaded")
       block body
       block footer

@@ -18,6 +18,7 @@
 
     Game.getWithTurns(session.game,
       function (game) {
+        console.log(game);
         Game.secure(game);
         GameTurn.subscribe(req.socket, game.id);
         return res.json(game)

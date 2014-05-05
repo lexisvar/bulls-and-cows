@@ -82,7 +82,7 @@ angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope', 'Play
      *
      * @param  {Function} callback
      */
-    $.joinLobby = function (callback) {
+    $.lobbyJoin = function (callback) {
       $socket.get('/lobby/join', function (response) {
         callback.call(null, response);
       })
@@ -96,9 +96,15 @@ angular.module('BullsAndCows').service('Server', ['$socket', '$rootScope', 'Play
       $socket.get('/lobby/leave');
     }
 
-    $.createGame = function (data, successCallback, errorHandler) {
+    $.gameCreate = function (data, successCallback, errorHandler) {
       $socket.get('/game/create', data, function (response) {
-        return handleResponse(response, successCallback, errorHandler)
+        handleResponse(response, successCallback, errorHandler)
+      })
+    }
+
+    $.gameEnter = function (callback) {
+      $socket.get('/game/enter', function (response) {
+        console.log('Server response: ', response);
       })
     }
 

@@ -7,12 +7,6 @@ angular.module('BullsAndCows').run([
      */
     $root.games = {}
 
-    $root.lobbyAdd = function (data) {
-      $root.apply(function () {
-        $root.games[data.id] = data;
-      })
-    }
-
     $root.lobbyLoad = function (games) {
       $root.apply(function () {
         for (var i in games) {
@@ -21,7 +15,13 @@ angular.module('BullsAndCows').run([
       })
     }
 
-    $root.lobbyRemove = function (game) {
+    $root.lobbyAddGame = function (data) {
+      $root.apply(function () {
+        $root.games[data.id] = data;
+      })
+    }
+
+    $root.lobbyRemoveGame = function (game) {
       $root.apply(function () {
         if ($root.games[game.id]) {
           delete $root.games[game.id];

@@ -62,7 +62,9 @@ angular.module('BullsAndCows').controller('SplashController', [
           displayWelcome(false);
         },
         function onError(errors) {
-          $scope.state.error = errors.name;
+          $scope.$apply(function () {
+            $scope.state.error = errors.name;
+          })
         });
     }
 

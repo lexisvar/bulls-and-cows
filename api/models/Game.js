@@ -137,16 +137,17 @@
   }
 
   $.getUniqueKeys = function (values, keys) {
-    var value, uniques = [];
+    var value, key, value, uniques = [];
 
     if (!(values instanceof Array)) {
       values = [values];
     }
 
     for (var i in values) {
-      for (var key in keys) {
+      for (var x in keys) {
+        key = keys[x];
         value = values[i][key];
-        if (uniques.indexOf(value) !== -1)
+        if (uniques.indexOf(value) === -1)
           uniques.push(value);
       }
     }
@@ -168,13 +169,13 @@
   }
 
   $.getWithNames = function (where, callback) {
-    var single = 'number' === typeof where ? true : false;
+    var single = 'number' === typeof where.id ? true : false;
 
-    return this
+    return Game
       .find(where)
-      .then(function (games) {
-        var ids = $.filterUniqueKeys(games, ['hostPlayerId', 'guestPlayerId']);
-        Player.findNames(ids, function (players) {
+      .exec(function (err, games) {
+        var ids = $.getUniqueKeys(games, ['hostId', 'guestId']);
+        Player.getNames(ids, function (players) {
           var i, game;
           for (i in games) {
             game = games[i];
@@ -197,13 +198,15 @@
   }
 
   $.getWithTurns = function (gameId, callback) {
-    return Game.getWithNames(gameId,
-      function (errors, game) {
+    return Game.getWithNames({
+        id: gameId
+      },
+      function (game) {
         GameTurn
           .find({
             gameId: game.id
           })
-          .then(function (turns) {
+          .exec(function (err, turns) {
             game.turns = turns;
             return callback.call(null, game);
           })

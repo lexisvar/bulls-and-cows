@@ -12,8 +12,8 @@ div.game(ng-show="!game.isWaiting")
     ul.turns
       li(ng-repeat="turn in $root.game.guest.turns")
         div.cow(ng-repeat="n in [] | range: turn.cows") cow
-        div.cow(ng-repeat="n in [] | range: turn.bulls") bull
+        div.bull(ng-repeat="n in [] | range: turn.bulls") bull
 
-  form.guess(ng-class="{host: $root.isHost}")
+  form.guess(ng-class="{host: $root.player.isHost}")
     input(type="text" model="data.guess")
     button(type="submit" ng-disabled="!$root.player.hasTurn") Guess!

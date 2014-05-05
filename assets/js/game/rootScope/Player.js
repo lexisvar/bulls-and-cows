@@ -10,7 +10,7 @@ angular.module('BullsAndCows').run([
      * Contains session info about the player
      * @type {Object}
      */
-    $.player = {
+    $root.player = {
       id: null,
       name: null,
       game: null,
@@ -51,7 +51,7 @@ angular.module('BullsAndCows').run([
      */
     $root.applyPlayerData = function (data, callback) {
       return $root.apply(function () {
-        $root.playerD = data;
+        $root.player = data;
         return 'function' === typeof callback ? callback.call(null, data) : undefined;
       });
     }

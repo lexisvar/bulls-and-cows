@@ -1,8 +1,7 @@
-var scope;
 angular.module('BullsAndCows').controller('LobbyController', [
   '$scope', '$rootScope', '$location', 'Server', 'PlayModes',
   function ($scope, $root, $location, Server, PlayModes) {
-    scope = $scope
+
     $scope.config = {
       modes: PlayModes.all,
     }
@@ -23,27 +22,46 @@ angular.module('BullsAndCows').controller('LobbyController', [
       secret: ''
     }
 
-    Server.joinLobby($root.loadGames);
+    // join the lobby -> get current open games and subscribe
+    // for changes
+    Server.lobbyJoin($root.lobbyLoad);
 
+    // on scope destroy, leave the lobby -> unsubscribe socket
     $scope.$on('$destroy', function () {
       Server.leaveLobby();
     })
 
+    /**
+     * Resets the game errors
+     * @return {void}
+     */
     var resetGameErrors = function () {
       $scope.game.errors = {}
     }
 
+    /**
+     * Sets a game error for the player mode
+     * @return {[type]} [description]
+     */
     var playModeGameError = function () {
       $scope.game.errors = {
         mode: 'You need to select a valid game mode'
       };
     }
 
+    /**
+     * Additional functionality when a game from the game menu is selected
+     * @param  {integer} gameId The id of the game
+     * @return {void}
+     */
     $scope.selectGame = function (gameId) {
       $scope.gameId = $scope.lobby.gameId === gameId ? undefined : gameId;
       $scope.lobby.joinDisabled = undefined === $scope.lobby.gameId ? true : false;
     }
 
+    /**
+     *
+     */
     $scope.isCurrentlySelectedGame = function (gameId) {
       return gameId === $scope.lobby.gameId;
     }
@@ -71,9 +89,10 @@ angular.module('BullsAndCows').controller('LobbyController', [
         $scope.game.secret
       );
 
-      return Server.createGame(data,
+      return Server.gameCreate(data,
         function success(response) {
-          $root.game = response;
+          $root.gameSet(response);
+          $location.path('/game');
         },
         function fail(errors) {
           $scope.$apply(function () {

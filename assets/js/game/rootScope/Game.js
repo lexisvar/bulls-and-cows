@@ -1,6 +1,8 @@
+var root;
 angular.module('BullsAndCows').run([
   '$rootScope',
   function ($root) {
+    root = $root;
     /**
      * Container for an ongoing game's data in structure
      * @type {Object}
@@ -40,6 +42,10 @@ angular.module('BullsAndCows').run([
           }
         }
       })
+    }
+
+    $root.gameGet = function () {
+      return $root.game.data;
     }
   }
 ]);

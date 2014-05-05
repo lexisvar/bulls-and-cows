@@ -13,14 +13,6 @@ angular.module('BullsAndCows').run([
     }
 
     /**
-     * The list of mulitplayer games, defaults to empty
-     * @type {Object}
-     */
-    $root.games = {}
-
-    var hideLoadingTimeout = 500;
-
-    /**
      * List of phases when NOT to use $apply
      * @type {Array}
      */

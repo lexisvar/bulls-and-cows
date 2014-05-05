@@ -6,7 +6,6 @@
 .rigging
 .tmp
 
-
 ########################
 # node.js / npm
 ########################
@@ -40,6 +39,7 @@ npm-debug.log
 nbproject
 .idea
 .sublime
+test.js
 
 ########################
 # local config
