@@ -19,19 +19,18 @@ module.exports = function (grunt) {
 
   // JS to be injected into the footer
   var footerJS = [
-    'js/game/app.js',
-    'js/game/providers/*.js',
-    'js/game/templates.js',
-    'js/game/config.js',
-    'js/game/routes.js',
-    'js/game/rootScope/Main.js',
-    'js/game/rootScope/*.js',
-    'js/game/directives/*.js',
-    'js/game/factories/*.js',
-    'js/game/services/*.js',
-    'js/game/controllers/*.js',
-    'js/game/*.js',
-    'js/*.js'
+    'game/app.js',
+    'game/providers/*.js',
+    'game/templates.js',
+    'game/config.js',
+    'game/routes.js',
+    'game/rootScope/Main.js',
+    'game/rootScope/*.js',
+    'game/directives/*.js',
+    'game/factories/*.js',
+    'game/services/*.js',
+    'game/controllers/*.js',
+    'game/*.js'
   ];
 
   // Libraries shared between backend and frontend, injected within the footer

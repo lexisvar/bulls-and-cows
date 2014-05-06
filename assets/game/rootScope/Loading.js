@@ -1,15 +1,19 @@
 angular.module('BullsAndCows').run([
   '$rootScope',
   function ($root) {
-    $root.flags.showLoading = true;
+    $root.flags.loadingIsVisible = true;
+
+    $root.loadingIsVisible = function () {
+      return $root.flags.loadingIsVisible;
+    }
 
     /**
      * Tells the $rootScope to HIDE the loading message
      * @return {void}
      */
-    $root.showLoading = function () {
+    $root.loadingShow = function () {
       return $root.apply(function () {
-        $root.flags.showLoading = true
+        $root.flags.loadingIsVisible = true
       });
     }
 
@@ -17,9 +21,9 @@ angular.module('BullsAndCows').run([
      * Tells $rootScope to HIDE the loading message
      * @return {[type]} [description]
      */
-    $root.hideLoading = function () {
+    $root.loadingHide = function () {
       return $root.apply(function () {
-        $root.flags.showLoading = false
+        $root.flags.loadingIsVisible = false
       });
     }
 

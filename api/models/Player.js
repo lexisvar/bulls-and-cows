@@ -55,5 +55,4 @@
         return callback.call(null, data);
       });
   }
-
 })(module.exports)

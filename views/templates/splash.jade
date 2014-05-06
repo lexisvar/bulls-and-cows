@@ -12,7 +12,7 @@
 
 // Welcome message
 .welcomeMessage(ng-show="state.showWelcome")
-  h1 Hey, {{$root.player.name}}
+  h1 Hey, {{$root.playerGetName()}}
   div(ng-switch="state.isReturning")
     h3(ng-switch-when="true")
       | Welcome Back!

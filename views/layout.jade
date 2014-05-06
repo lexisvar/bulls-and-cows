@@ -1,7 +1,7 @@
 doctype html
 html
   head
-  title= title
+  title Bulls and Cows
 
   // Viewport mobile tag for sensible mobile support
   meta(name="viewport",content="width=device-width, initial-scale=1, maximum-scale=1")
@@ -11,10 +11,10 @@ html
   include _meta/styles
   block styles
   body(ng-app="BullsAndCows" ng-controller="FrontController")
-    section(ng-view ng-show="$root.flags.appLoaded")
+    section(ng-view ng-show="$root.appIsLoaded()")
       block body
       block footer
-    section.loading(ng-show="$root.flags.showLoading")
+    section.loading(ng-show="$root.loadingIsVisible()")
       | Loading screen
     - /* includes JavaScripts loaded in the footer of the page */
     include _meta/bottomScripts

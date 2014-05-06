@@ -58,6 +58,10 @@
       type: 'boolean',
       defaultsTo: false
     },
+    isPrematureClosed: {
+      type: 'boolean',
+      defaultsTo: false
+    },
     isOver: {
       type: 'boolean',
       defaultsTo: false
@@ -202,14 +206,35 @@
         id: gameId
       },
       function (game) {
+        if (undefined === game) {
+          return callback.call(null, null);
+        }
+
         GameTurn
           .find({
             gameId: game.id
           })
           .exec(function (err, turns) {
-            game.turns = turns;
-            return callback.call(null, game);
+            return callback.call(null, game, turns);
           })
+      })
+  }
+
+  $.closeOpenGames = function (playerId) {
+    return Game
+      .update({
+        or: [{
+          hostId: playerId
+        }, {
+          guestId: playerId
+        }],
+        isOver: false
+      }, {
+        isPrematureClosed: true,
+        isOver: true
+      })
+      .then(function (error, games) {
+
       })
   }
 })(module.exports);

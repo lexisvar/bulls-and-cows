@@ -39,7 +39,7 @@ angular.module('BullsAndCows').controller('SplashController', [
      * show them the Welcome screen, otherwise show the "Enter name" form
      */
     $scope.continueToLobby = function () {
-      if (true === $root.hasPlayerId()) {
+      if (true === $root.playerHasId()) {
         displayWelcome(true);
       } else {
         $scope.state.showNameForm = true;
@@ -57,7 +57,7 @@ angular.module('BullsAndCows').controller('SplashController', [
 
       $scope.state.error = null;
 
-      Server.registerPlayer(data,
+      Server.playerRegister(data,
         function onSuccess(response) {
           displayWelcome(false);
         },

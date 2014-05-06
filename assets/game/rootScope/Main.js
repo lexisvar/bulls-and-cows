@@ -24,7 +24,7 @@ angular.module('BullsAndCows').run([
      * @return {void}
      */
     $root.apply = function (callback) {
-      return dontApplyWhen.indexOf($root.$$phase) > -1 ? callback.call() : $root.$apply(callback);
+      dontApplyWhen.indexOf($root.$$phase) > -1 ? callback.call() : $root.$apply(callback);
     }
 
     /**
@@ -32,11 +32,19 @@ angular.module('BullsAndCows').run([
      * hide the loading message
      * @return {void}
      */
-    $root.appIsLoaded = function () {
-      return $root.apply(function () {
+    $root.appLoadComplete = function () {
+      $root.apply(function () {
         $root.flags.appLoaded = true;
-        $root.hideLoading();
+        $root.loadingHide();
       });
+    }
+
+    /**
+     * Checks if the application is loaded
+     * @return {boolean} True if load is complete
+     */
+    $root.appIsLoaded = function () {
+      return $root.flags.appLoaded;
     }
   }
 ])

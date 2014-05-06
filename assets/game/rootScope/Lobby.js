@@ -34,5 +34,13 @@ angular.module('BullsAndCows').run([
         $root.games = {};
       })
     }
+
+    $root.lobbyGetGames = function () {
+      return $root.games;
+    }
+
+    $root.lobbyHasGames = function () {
+      return $root.games.length > 0;
+    }
   }
 ])

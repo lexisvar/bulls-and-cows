@@ -22,15 +22,22 @@ angular.module('BullsAndCows').run([
      * Checks if the user has a playerId
      * @return {Boolean} True if they do, false otherwise
      */
-    $root.hasPlayerId = function () {
+    $root.playerHasId = function () {
       return $root.player.id ? true : false;
+    }
+
+    /**
+     * @return {integer|null} The player' session id
+     */
+    $root.playerGetId = function () {
+      return $root.player.id;
     }
 
     /**
      * Getter for the player name
      * @return {string} The value of $rootScope.player.name
      */
-    $root.getPlayerName = function () {
+    $root.playerGetName = function () {
       return $root.player.name;
     }
 
@@ -39,8 +46,42 @@ angular.module('BullsAndCows').run([
      * @param  {Function} callback Optional callback to receive the player data
      * @return {void|object}       Passes player data to callback or returns it directly
      */
-    $root.getPlayerData = function (callback) {
+    $root.playerGetData = function (callback) {
       return 'function' === typeof callback ? callback.call(null, $root.player) : $root.player;
+    }
+
+    /**
+     * Change the player's game id, used when browsing games by Id, instead
+     * of based on session
+     * @param  {integer} gameId  GameId
+     * @param  {boolean} setNull Indicates that the game Id can be set to null
+     * @return {void}
+     */
+    $root.playerSetGame = function (gameId, setNull) {
+      gameId = parseInt(gameId);
+      if (setNull || (!isNaN(gameId) && gameId > 0)) {
+        $root.apply(function () {
+          $root.player.game = gameId;
+        })
+      }
+    }
+
+    /**
+     * Sets the player's isHost flag
+     * @param  {Boolean} isHost
+     * @return {void}
+     */
+    $root.playerSetIsHost = function (isHost) {
+      $root.apply(function () {
+        $root.player.isHost = isHost;
+      })
+    }
+
+    /**
+     * @return {integer|null} The current player selected game Id
+     */
+    $root.playerGetGame = function () {
+      return $root.player.game;
     }
 
     /**
@@ -49,7 +90,7 @@ angular.module('BullsAndCows').run([
      * @param  {Function} callback Optional callback to receive the data
      * @return {void|undefined}    Passes player data to callback, if any or undefined
      */
-    $root.applyPlayerData = function (data, callback) {
+    $root.playerApplyData = function (data, callback) {
       return $root.apply(function () {
         $root.player = data;
         return 'function' === typeof callback ? callback.call(null, data) : undefined;

@@ -1,6 +1,6 @@
 angular.module('BullsAndCows').controller('LobbyController', [
-  '$scope', '$rootScope', '$location', 'Server', 'PlayModes',
-  function ($scope, $root, $location, Server, PlayModes) {
+  '$scope', '$rootScope', '$location', '$timeout', 'Server', 'PlayModes',
+  function ($scope, $root, $location, $timeout, Server, PlayModes) {
 
     $scope.config = {
       modes: PlayModes.all,
@@ -8,7 +8,8 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     $scope.lobby = {
       gameId: undefined,
-      joinDisabled: true
+      joinDisabled: true,
+      leave: true
     }
 
     $scope.game = {
@@ -28,7 +29,9 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     // on scope destroy, leave the lobby -> unsubscribe socket
     $scope.$on('$destroy', function () {
-      Server.leaveLobby();
+      if (true === $scope.lobby.leave) {
+        Server.lobbyLeave();
+      }
     })
 
     /**
@@ -60,12 +63,17 @@ angular.module('BullsAndCows').controller('LobbyController', [
     }
 
     /**
-     *
+     * @param  {integer}  gameId Selected game' id
+     * @return {Boolean}         True if the currently selected id
      */
     $scope.isCurrentlySelectedGame = function (gameId) {
       return gameId === $scope.lobby.gameId;
     }
 
+    /**
+     * Toggle the state of the showForm flag
+     * @return {void}
+     */
     $scope.toggleGameForm = function () {
       $scope.game.showForm = !$scope.game.showForm;
     }
@@ -89,14 +97,29 @@ angular.module('BullsAndCows').controller('LobbyController', [
         $scope.game.secret
       );
 
+      // send request to server
       return Server.gameCreate(data,
-        function success(response) {
-          $root.gameSet(response);
-          $location.path('/game');
+
+        // set game to $rootScope and redirect to game controller
+        function onCreateSuccess(response) {
+          Server.gameEnter(response.id, function () {
+            $location.path('/game/' + response.id);
+            $scope.$apply();
+          })
         },
-        function fail(errors) {
+
+        // apply errors to $scope
+        function onCreateFail(errors) {
           $scope.$apply(function () {
             $scope.game.errors = errors;
+
+            // if error of type 'has game' -> redirect to game controller
+            if (errors.hasGame) {
+              $timeout(
+                function redirectToGame() {
+                  $location.path('/game/' + $root.playerGetGame());
+                }, 2000);
+            }
           })
         }
       )
@@ -112,11 +135,11 @@ angular.module('BullsAndCows').controller('LobbyController', [
     }
 
     $scope.hasGames = function () {
-      return Object.keys($root.games).length > 0;
+      return Object.keys($root.lobbyGetGames()).length > 0;
     }
 
     $scope.joinGame = function () {
-      Server.joinGame($scope.lobby.gameId);
+      Server.gameJoin($scope.lobby.gameId);
     }
   }
 ]);

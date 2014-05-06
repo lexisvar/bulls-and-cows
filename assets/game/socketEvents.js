@@ -9,25 +9,16 @@ angular.module('BullsAndCows').run([
      */
     $socket.socket.on('message', function (message) {
       console.log('Socket message:', message);
-      switch (message.model) {
-      case 'game':
-        if ('create' === message.verb)
+      if ('game' === message.model) {
+        switch (message.verb) {
+        case 'create':
           return $root.lobbyAddGame(message.data);
-
-        if ('destroy' === message.verb)
+        case 'destroy':
           return $root.lobbyRemoveGame(message.data);
-
-        if ('update' === message.verb) {
-          if ('start' === message.data.action) {
-            return $root.gameStart(message.data);
-          } else if ('unsubscribe' === message.data.action) {
-            return $root.lobbyReset();
-          }
+        case 'update':
+          if ('turn' === message.data.action)
+            return $root.gameAddTurn(message.data.turn);
         }
-
-        break;
-      case 'gameTurn':
-        return $root.addTurn(message.data);
       }
     });
 

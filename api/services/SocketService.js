@@ -17,21 +17,38 @@
    * @param  {boolean}  connect Count towards connect or disconnect
    */
   $.countConnections = function (session, connect) {
-    var id = parseInt(session.playerId),
-      count = counter[id] || 0;
+    var id = parseInt(session.playerId);
 
     if (isNaN(id))
       return false;
 
-    count += true === connect ? 1 : -1;
-
-    if (1 === count && true === connect) {
-      $.countOnline(true);
+    if (undefined === counter[id])
       counter[id] = 0;
-    } else if (0 === count) {
+
+    // count multiple connections from the same user
+    counter[id] += true === connect ? 1 : -1;
+
+    // if first connection for user, increase total count by 1
+    if (1 === counter[id] && true === connect) {
+      $.countOnline(true);
+    }
+
+    // if count equals 0 (e.g. last disconnecting socket instance)
+    else if (0 === counter[id]) {
+      // reduce total count by 1
       $.countOnline(false);
+
+      // delete counter for user
       delete counter[id];
-      Player.closeOpenGames(id);
+
+      // unset game session
+      Session.setGame({
+        session: session
+      }, null);
+      session.save();
+
+      // close all open games
+      Game.closeOpenGames(id);
     }
   }
 

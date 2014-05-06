@@ -14,7 +14,7 @@
     },
 
     playerId: {
-      type: 'string',
+      type: 'integer',
       required: true,
     },
 
@@ -34,15 +34,24 @@
       required: true
     },
 
+    isBotTurn: {
+      type: 'boolean',
+      defaultsTo: false
+    },
+
     isWinning: {
       type: 'boolean',
       defaultsTo: false
     }
   }
 
+  /**
+   * Model validators
+   * @type {Object}
+   */
   $.types = {
     isValidGameNumber: function (number) {
-      return GameService.isValidNumber(number);
+      return Engine.isValidNumber(number);
     }
   }
 
@@ -51,47 +60,49 @@
     next();
   }
 
-  $.afterCreate = function (record, next) {
-    $.updateCount(new Game(record.gameI));
-    next();
-  }
-
-  $.toJSON = function () {
-    var json = this.toObject();
-    delete json.id;
-  }
-
-  $.updateCount = function (game) {
-    this.countByGameId(game.id, function (error, count) {
-      game.update({
-        turnCount: count
-      });
-    });
-  }
-
-  $.playTurn = function (guess, player, successCallback, failCallback) {
+  /**
+   * Save a game turn in the database, verify for errors before that,
+   * call failCallback if there are any issues
+   * @param  {object} data              Contains isHost, playerId, isBotTurn, guess, gameId
+   * @param  {function} successCallback Called upon successful object creation
+   * @param  {function} failCallback    Called when there's an issue with the data or turned played
+   * @return {void}
+   */
+  $.playTurn = function (data, successCallback, failCallback) {
     Game
-      .findOne(player.game)
-      .exec(function (errors, game) {
-        if (player.isHost !== game.isHostTurn) {
-          return failCallback.call(null, game);
+      .findOne(data.gameId)
+      .exec(function (gameErrors, game) {
+        if (game.isMultiplayer && data.isHost !== game.isHostTurn) {
+          return failCallback.call(null, game, null);
         }
 
-        var secret = player.isHost ? game.guestSecret : game.hostSecret;
-        var result = Engine.findMatches(guess, secret);
+        if (game.isOver) {
+          return failCallback.call(null, game, null);
+        }
+
+        var secret = data.isHost ? game.guestSecret : game.hostSecret;
+        var result = Engine.findMatches(data.guess, secret);
 
         GameTurn
           .create({
-            gameId: game.id,
-            playerId: player.id,
-            guess: guess,
+            gameId: data.gameId,
+            playerId: data.playerId,
+            guess: data.guess,
+            isBotTurn: data.isBotTurn,
             cows: result.c,
-            bulls: result.b
+            bulls: result.b,
+            isWinning: result.b === 4 ? true : false
           })
           .done(function (errors, turn) {
-            if (turn.bulls === 4) {
+            if (null !== errors) {
+              return failCallback.call(null, game, errors)
+            }
+
+            if (true === turn.isWinning) {
               game.isOver = true;
-              game.save();
+              return game.save(function (err) {
+                successCallback.call(null, game, turn);
+              });
             }
             successCallback.call(null, game, turn);
           })

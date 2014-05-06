@@ -121,15 +121,15 @@
   /**
    * Reduce an array of possiblities based on a list of previous moves
    * @param  {array} set   List of possibe answers
-   * @param  {arry} moves  List of moves (each has guess number and score)
+   * @param  {arry}  turns List of turns (each has guess number and score)
    * @return {array}       The filtered set
    */
-  $.filterMoves = function (set, moves) {
-    var move, score, secret;
-    for (var i in moves) {
-      move = moves[i];
-      score = $.buildScore(move.bulls, move.cows);
-      set = $.filterSet(set, move.secret, score);
+  $.filterTurns = function (set, turns) {
+    var turn, score, secret;
+    for (var i in turns) {
+      turn = turns[i];
+      score = $.buildScore(turn.bulls, turn.cows);
+      set = $.filterSet(set, turn.guess, score);
     }
     return set;
   }
@@ -169,7 +169,7 @@
   }
   // if angular is defined
   else if ('object' === typeof angular) {
-    angular.module('BullsAndCows').factory('Game', function () {
+    angular.module('BullsAndCows').service('Game', function () {
       return $;
     });
   }

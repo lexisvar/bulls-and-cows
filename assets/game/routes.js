@@ -1,6 +1,6 @@
 angular.module('BullsAndCows').config([
-  '$routeProvider',
-  function ($routeProvider) {
+  '$routeProvider', '$locationProvider',
+  function ($routeProvider, $locationProvider) {
     'use strict';
 
     $routeProvider
@@ -12,12 +12,14 @@ angular.module('BullsAndCows').config([
         controller: 'LobbyController',
         templateUrl: 'templates/lobby.html'
       })
-      .when('/game', {
+      .when('/game/:id', {
         controller: 'GameController',
         templateUrl: 'templates/game.html'
       })
       .otherwise({
         redirectTo: '/'
       });
+
+    //$locationProvider.html5Mode(true).hashPrefix('!');
   }
 ]);
