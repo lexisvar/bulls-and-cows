@@ -66,12 +66,13 @@ module.exports = function (grunt) {
   grunt.loadTasks(depsPath + '/grunt-contrib-copy/tasks');
   grunt.loadTasks(depsPath + '/grunt-contrib-concat/tasks');
   grunt.loadTasks(depsPath + '/grunt-contrib-watch/tasks');
-  grunt.loadTasks(depsPath + '/grunt-contrib-uglify/tasks');
   grunt.loadTasks(depsPath + '/grunt-contrib-cssmin/tasks');
   grunt.loadTasks(depsPath + '/grunt-contrib-less/tasks');
   grunt.loadTasks(depsPath + '/grunt-sails-linker/tasks');
+
   grunt.loadNpmTasks('grunt-angular-templates');
   grunt.loadNpmTasks('grunt-contrib-jade');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Project configuration.
   grunt.initConfig({
@@ -148,6 +149,11 @@ module.exports = function (grunt) {
 
     // Uglify
     uglify: {
+      options: {
+        compress: {
+          drop_console: true
+        }
+      },
       distHeaderJS: {
         src: ['.tmp/public/concat/libs.js'],
         dest: '.tmp/public/min/libs.js'
