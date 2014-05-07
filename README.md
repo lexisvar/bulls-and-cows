@@ -9,6 +9,9 @@ The application includes an implementation of a number guessing mechanism, based
 node proof-of-concept.js
 ```
 
+### Requirements
+In order to have persistent sessions, you need to configure a redis connection in `config/session.js`
+
 ### Installation
 Node & NPM are a clear requirements for this one, but you'll also need Bower for the front-end stuff. To install bower run:
 
@@ -25,3 +28,9 @@ bower install
 
 ### Launching the game
 Start the app using `./launch.sh` and then access it at `http://localhost:1337/`
+
+### Credits
+Thanks to (Martin Berube)[http://www.how-to-draw-funny-cartoons.com/] for providing his royalty free vector icons, that are used for ingame.
+
+### License
+MIT License
