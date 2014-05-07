@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 (function ($) {
 
   $.autoCreatedAt = true;
@@ -38,19 +40,21 @@
   }
 
   $.getNames = function (where, callback) {
+    where = {
+      id: where
+    }
+
     return Player
-      .find({
-        id: where
-      })
+      .find(where)
       .exec(function (err, players) {
         var data = [];
-        if (!(players instanceof Array)) {
-          players = [players];
-        }
 
-        for (var i in players) {
-          data[players[i].id] = players[i].name;
-        }
+        if (!_.isArray(players))
+          players = [players]
+
+        _.forEach(players, function (player) {
+          data[player.id] = player.name
+        })
 
         return callback.call(null, data);
       });

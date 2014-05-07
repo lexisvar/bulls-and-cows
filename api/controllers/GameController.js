@@ -1,23 +1,11 @@
 (function ($) {
 
-  var announceNewGame = function (game, socketExclude) {
-    if (game.isMultiplayer) {
-      Player.getNames(game.hostId,
-        function (player) {
-          game.host = player.name;
-          return Game.publishCreate(Game.secure(game), socketExclude);
-        })
-    }
-  }
-
   $.enter = function (req, res) {
     var session = Session.get(req);
     var gameId = parseInt(req.param('id'));
+
     if (isNaN(gameId))
       gameId = session.game;
-
-    // unsubscribe from the global Game scope
-    Game.unsubscribe(req.socket);
 
     // get game with turns and send them to user
     Game.getWithTurns(gameId,
@@ -33,8 +21,9 @@
 
         // if the game is over, remove the player session for it
         if (game.isOver) {
-          //Session.setGame(req, null);
+          Session.setGame(req, null);
         }
+
         // subscribe for this game specifically
         else {
           Game.subscribe(req.socket, game);
@@ -59,21 +48,18 @@
     }
 
     GameTurn.playTurn(data,
-      function onSuccess(game, turn) {
-        Game.publishUpdate(game.id, {
-          action: 'turn',
-          turn: turn
-        });
+      function turnSuccess(game, turn) {
+        SocketService.gameTurn(game.id, turn);
 
-        // if this is the winning turn, 
-        // destroy the player session
+        // if this is the winning turn -> destroy the player session
         if (turn.isWinning) {
           Session.setGame(req, null);
         }
 
         return res.json(turn);
       },
-      function onFail(game, turnErrors) {
+
+      function turnFail(game, turnErrors) {
         if (true === game.isOver) {
           return res.json({
             error: 'The game is over!'
@@ -93,7 +79,6 @@
   }
 
   $.create = function (req, res) {
-
     // if already have game session, return error
     if (null !== Session.getGame(req)) {
       return res.json({
@@ -103,62 +88,76 @@
       })
     }
 
-    Game.newGame(
-      req.params.all(),
-      Session.get(req),
-      function (errors, game) {
-        // output errors
-        if (errors) {
-          return res.json({
-            errors: Errors.format(Game, errors)
-          });
-        }
+    var data = {
+      params: req.params.all(),
+      playerId: Session.get(req, 'id')
+    }
 
-        // set session game
-        Session.setGame(req, game);
+    Game.host(data, function (errors, game) {
+      // output errors
+      if (errors) {
+        return res.json({
+          errors: Errors.format(Game, errors)
+        });
+      }
 
-        // unsubscribe from global listeners, subscribe to game only
-        Game.unsubscribe(req.socket);
-        Game.subscribe(req.socket, game);
+      // set player session info about the game
+      Session.setGame(req, game);
 
-        // announce to listening sockets
-        announceNewGame(game);
+      // socket tasks
+      SocketService
+        .gameJoin(game.id, req.socket)
+        .lobbyIntroduce(game)
+        .lobbyLeave(req.socket);
 
-        // secure output
-        Game.secure(game);
-        return res.json(game);
-      });
+      // secure output
+      Game.secure(game);
+      return res.json(game);
+    });
   }
 
   $.join = function (req, res) {
-    Game
-      .findOne(req.param('id'))
-      .then(function (errors, game) {
-        if (!game || game.guestId) {
-          return res.json({
-            error: 'The game is not found or is already full'
-          });
-        }
+    var session = Session.get(req);
+    var data = {
+      id: req.param('id'),
+      guestSecret: req.param('secret'),
+      guestId: session.id
+    }
 
-        game.guestId = Session.get(req, 'id');
-        game.guestSecret = param('secret');
+    var guestInfo = {
+      guestId: session.id,
+      guest: session.name
+    }
 
-        game.save(function (errors, game) {
-          if (errors) {
-            return res.json({
-              errors: Errors.format(Game, errors)
-            })
-          }
-
-          Session.setGame(req, game);
-          return res.json(game);
+    Game.join(data, function (errors, game) {
+      if (!game || session.id !== game.guestId) {
+        return res.json({
+          error: 'The game is not found or is already full'
         });
-      });
+      }
+
+      if (errors) {
+        return res.json({
+          errors: Errors.format(Game, errors)
+        })
+      }
+
+      Session.setGame(req, game);
+      Game.secure(game);
+
+      SocketService
+        .gameJoin(game.id, req.socket)
+        .lobbyLeave(req.socket)
+        .gameGuestArrived(game.id, guestInfo, req.socket)
+
+      return res.json(game);
+    })
   }
 
   $.secret = function (req, res) {
-    Game
-      .findOne(req.param('id'))
+    var gameId = req.param('id');
+
+    Game.findOne(gameId)
       .then(function (game) {
         if (!game || game.isMultiplayer) {
           return res.json({

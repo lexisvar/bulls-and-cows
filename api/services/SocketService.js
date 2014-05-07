@@ -68,6 +68,82 @@
     return totalUsers;
   }
 
+  /**
+   * Lobby events
+   */
+
+  $.lobbyIntroduce = function (game) {
+    if (!game.isMultiplayer)
+      return $;
+
+    Player
+      .findOne(game.hostId)
+      .then(function (player) {
+        var message = {
+          id: game.id,
+          title: game.title,
+          host: player.name,
+          isCooperative: game.isCooperative
+        }
+
+        sails.io.sockets. in ('lobby')
+          .emit('newGame', message)
+      })
+
+    return $;
+  }
+
+  $.lobbyRemoveGame = function (id) {
+    sails.io.sockets. in ('lobby')
+      .emit('removeGame', id);
+    return $;
+  }
+
+  $.lobbyJoin = function (socket) {
+    socket.join('lobby');
+    return $;
+  }
+
+  $.lobbyLeave = function (socket) {
+    socket.leave('lobby');
+    return $;
+  }
+
+  /**
+   * Game events
+   */
+
+  var gameRoom = function (gameId) {
+    return 'game_' + gameId;
+  }
+
+  $.gameJoin = function (gameId, socket) {
+    socket.join(gameRoom(gameId));
+    return $;
+  }
+
+  $.gameLeave = function (gameId, socket) {
+    socket.leave(gameRoom(gameId));
+    return $;
+  }
+
+  $.gameGuestArrived = function (gameId, data, socket) {
+    socket.broadcast.to(gameRoom(gameId))
+      .emit('guestArrived', data);
+    return $;
+  }
+
+  $.gameTurn = function (gameId, data) {
+    sails.io.sockets. in (gameRoom(gameId))
+      .emit('turn', data);
+    return $;
+  }
+
+  $.gamePrematureClose = function (gameId, data) {
+    sails.io.sockets. in (gameRoom(gameId))
+      .emit('prematureClose', data);
+  }
+
 
   return $;
 })(module.exports)

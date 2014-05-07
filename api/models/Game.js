@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 (function ($) {
   $.autoCreatedAt = false;
   $.autoUpdatedAt = false;
@@ -5,11 +7,11 @@
   var invalidNumberError = "The number must be 4 digits long, " +
     "not containg any duplicate digits and not starting with a 0";
 
-  var validTitleRegex = /^[a-zA-Z 0-9]{5,}$/;
+  var validTitleRegex = /^[a-zA-Z 0-9]{4,}$/;
 
   $.errorMessages = {
     title: 'A valid game title is required, it should ' +
-      'be alphanumeric and at least 5 characters long',
+      'be alphanumeric and at least 4 characters long',
     hostSecret: invalidNumberError,
     guestSecret: invalidNumberError
   }
@@ -111,14 +113,16 @@
     this.save();
   }
 
-  $.newGame = function (params, session, callback) {
-    var data;
+  $.host = function (data, callback) {
+    var properties,
+      params = data.params,
+      playerId = data.playerId;
 
     // if a Multiplayer game
     if (params['isMultiplayer']) {
-      data = {
+      properties = {
         title: params['title'] || -1, // some modifications to trigger title validator        
-        hostId: session.id,
+        hostId: playerId,
         hostSecret: !params['isCooperative'] ? params['secret'] : Engine.pickRandom(),
         isMultiplayer: true,
         isCooperative: params['isCooperative'] || false,
@@ -126,47 +130,85 @@
     }
     // if a single player game vs Server
     else {
-      data = {
+      properties = {
         hostId: ServerPlayer.get('id'),
-        guestId: session.id,
+        guestId: playerId,
         hostSecret: Engine.pickRandom(),
         isWithBot: params['isWithBot'] || false,
         isCooperative: params['isCooperative'] || false,
       }
     }
 
-    return this
-      .create(data)
-      .done(callback);
+    return this.create(properties).done(callback);
   }
 
-  $.getUniqueKeys = function (values, keys) {
-    var value, key, value, uniques = [];
-
-    if (!(values instanceof Array)) {
-      values = [values];
+  $.join = function (data, callback) {
+    var id = {
+      id: data.id
     }
 
-    for (var i in values) {
-      for (var x in keys) {
-        key = keys[x];
-        value = values[i][key];
-        if (uniques.indexOf(value) === -1)
-          uniques.push(value);
+    Game
+      .findOne(id)
+      .then(function (game) {
+        // game not found or game has guest already
+        if (!game || (game.guestId !== null)) {
+          return callback.call(null, null, game);
+        }
+
+        // set the guest properties to the game object
+        game.guestId = data.guestId;
+        game.guestSecret = data.guestSecret;
+
+        // save
+        game
+          .save(function (errors, game) {
+            if (null !== errors) {
+              return callback.call(null, errors, game);
+            }
+
+            // getWithNames doesn't return errors, so need to
+            // extend the callback to set game at its proper
+            // position for the controller method
+            return Game.getWithNames(id, function (game) {
+              callback.call(null, null, game)
+            });
+          })
+      })
+  }
+
+  /**
+   * Finds unique key values in a collection of objects
+   * @param  {array|object} values One or multiple objects
+   * @param  {array|string} keys   One or more keys to look for uniques
+   * @return {[type]}        [description]
+   */
+  $.getUniqueKeys = function (objects, keys) {
+    var uniques = [];
+
+    if (!_.isArray(objects))
+      objects = [objects];
+
+    if (!_.isArray(keys))
+      keys = [keys];
+
+    _.forEach(objects, function (object) {
+      for (var key in keys) {
+        if (_.contains(uniques, object[keys[key]])) {
+          uniques.push(object[key]);
+        }
       }
-    }
+    })
 
     return uniques;
   }
 
   $.secure = function (games) {
-    if (!(games instanceof Array)) {
+    if (!_.isArray(games))
       games = [games];
-    }
 
-    for (var x in games) {
-      delete games[x].hostSecret;
-      delete games[x].guestSecret;
+    for (var game in games) {
+      delete games[game].hostSecret;
+      delete games[game].guestSecret;
     }
 
     return games;
@@ -179,15 +221,15 @@
       .find(where)
       .exec(function (err, games) {
         var ids = $.getUniqueKeys(games, ['hostId', 'guestId']);
+
         Player.getNames(ids, function (players) {
-          var i, game;
-          for (i in games) {
-            game = games[i];
+          _.forEach(games, function (game) {
             game.host = players[game.hostId];
             game.guest = players[game.guestId];
-          }
+            Game.secure(game);
+          })
 
-          return callback.call(null, single ? games[i] : games);
+          return callback.call(null, single ? games[0] : games);
         })
       })
   }
@@ -196,7 +238,7 @@
     var where = {
       isMultiplayer: true,
       isOver: false,
-      guestPlayerId: null
+      guestId: null
     }
     return this.getWithNames(where, callback);
   }
@@ -221,20 +263,28 @@
   }
 
   $.closeOpenGames = function (playerId) {
-    return Game
-      .update({
-        or: [{
-          hostId: playerId
-        }, {
-          guestId: playerId
-        }],
-        isOver: false
+    var matching = {
+      isOver: false,
+      or: [{
+        hostId: playerId
       }, {
-        isPrematureClosed: true,
-        isOver: true
-      })
-      .then(function (error, games) {
+        guestId: playerId
+      }]
+    }
 
+    var withData = {
+      isPrematureClosed: true,
+      isOver: true
+    }
+
+    return Game
+      .update(matching, withData)
+      .then(function (games) {
+        _.forEach(games, function (game) {
+          SocketService
+            .lobbyRemoveGame(game.id)
+            .gamePrematureClose(game.id, withData);
+        })
       })
   }
 })(module.exports);
