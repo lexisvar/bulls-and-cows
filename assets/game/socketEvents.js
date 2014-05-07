@@ -33,4 +33,4 @@ angular.module('BullsAndCows').run([
       return $root.gamePrematureClose(data);
     })
   }
-])
+]);

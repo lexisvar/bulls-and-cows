@@ -1,6 +1,6 @@
 angular.module('BullsAndCows').config([
-  '$routeProvider', '$locationProvider',
-  function ($routeProvider, $locationProvider) {
+  '$routeProvider',
+  function ($routeProvider) {
     'use strict';
 
     $routeProvider
@@ -19,7 +19,5 @@ angular.module('BullsAndCows').config([
       .otherwise({
         redirectTo: '/'
       });
-
-    //$locationProvider.html5Mode(true).hashPrefix('!');
   }
 ]);

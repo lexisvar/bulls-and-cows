@@ -128,6 +128,18 @@ angular.module('BullsAndCows').run([
     }
 
     /**
+     * Called when a game closes prematurely
+     * @param  {object} game :: A minimal game data object
+     * @return {void}
+     */
+    $root.gamePrematureClose = function (game) {
+      $root.apply(function () {
+        $root.game.data.isPrematureClosed = game.gameIsPrematureClosed;
+        $root.game.data.isOver = game.isOver;
+      })
+    }
+
+    /**
      * Multiple simple data accessors continue below!
      */
     $root.gameIsLoaded = function () {
