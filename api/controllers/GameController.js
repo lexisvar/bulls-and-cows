@@ -75,11 +75,12 @@
           turn: turn
         }
 
+        SocketService.gameTurn(game.id, message);
+
         if (turn.isWinning) {
           SocketService.gameUnsubscribeAll(game.id);
         }
 
-        SocketService.gameTurn(game.id, message);
         return res.json(turn);
       },
       function turnFail(game, errors) {

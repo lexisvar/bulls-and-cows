@@ -5,7 +5,6 @@
 angular.module('BullsAndCows').run([
   '$rootScope', 'Server',
   function ($root, Server) {
-
     /**
      * Container for an ongoing game's data in structure
      * @type {Object}
