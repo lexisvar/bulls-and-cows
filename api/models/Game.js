@@ -83,7 +83,7 @@ var _ = require('lodash');
     },
 
     isValidGuestSecret: function (secret) {
-      if (!this.isMultiplayer || !this.guestPlayerId)
+      if (!this.isMultiplayer || !this.guestId || this.isCooperative)
         return true;
 
       return Engine.isValidNumber(parseInt(secret));
@@ -147,6 +147,9 @@ var _ = require('lodash');
       id: data.id
     }
 
+    // enforce validation, if value's not set
+    data.guestSecret = data.guestSecret || -1;
+
     Game
       .findOne(id)
       .then(function (game) {
@@ -192,8 +195,10 @@ var _ = require('lodash');
       keys = [keys];
 
     _.forEach(objects, function (object) {
-      for (var key in keys) {
-        if (_.contains(uniques, object[keys[key]])) {
+      var i, key;
+      for (i in keys) {
+        key = keys[i];
+        if (!_.contains(uniques, object[key])) {
           uniques.push(object[key]);
         }
       }
@@ -221,12 +226,12 @@ var _ = require('lodash');
       .find(where)
       .exec(function (err, games) {
         var ids = $.getUniqueKeys(games, ['hostId', 'guestId']);
-
         Player.getNames(ids, function (players) {
-          _.forEach(games, function (game) {
+          games = _.map(games, function (game) {
             game.host = players[game.hostId];
             game.guest = players[game.guestId];
             Game.secure(game);
+            return game;
           })
 
           return callback.call(null, single ? games[0] : games);
@@ -244,22 +249,24 @@ var _ = require('lodash');
   }
 
   $.getWithTurns = function (gameId, callback) {
-    return Game.getWithNames({
-        id: gameId
-      },
-      function (game) {
-        if (undefined === game) {
-          return callback.call(null, null);
-        }
+    var where = {
+      id: gameId
+    }
 
-        GameTurn
-          .find({
-            gameId: game.id
-          })
-          .exec(function (err, turns) {
-            return callback.call(null, game, turns);
-          })
-      })
+    return Game.getWithNames(where, function (game) {
+      if (undefined === game) {
+        return callback.call(null, null);
+      }
+
+      where = {
+        gameId: game.id
+      }
+
+      GameTurn.find(where).exec(
+        function (err, turns) {
+          return callback.call(null, game, turns);
+        })
+    })
   }
 
   $.closeOpenGames = function (playerId) {

@@ -39,8 +39,12 @@ angular.module('BullsAndCows').run([
       })
     }
 
-    $root.gameAddTurn = function (turn) {
-      return $root.gameSetTurns([turn]);
+    $root.gameAddTurn = function (data) {
+      $root.apply(function () {
+        $root.game.data.isOver = data.game.isOver;
+        $root.game.data.isHostTurn = data.game.isHostTurn;
+      });
+      return $root.gameSetTurns([data.turn]);
     }
 
     $root.gameApplyGuestPlayer = function (data) {

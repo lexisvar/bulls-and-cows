@@ -80,30 +80,42 @@
           return failCallback.call(null, game, null);
         }
 
-        var secret = data.isHost ? game.guestSecret : game.hostSecret;
-        var result = Engine.findMatches(data.guess, secret);
+        console.log(!game.isMultiplayer || game.isCooperative);
+
+        var secret;
+        if (!game.isMultiplayer || game.isCooperative) {
+          secret = game.hostSecret;
+        } else {
+          secret = data.isHost ? game.guestSecret : game.hostSecret;
+        }
+
+        console.log(secret, game.guestSecret, game.hostSecret);
+
+        var score = Engine.findMatches(data.guess, secret);
+        var turnData = {
+          gameId: data.gameId,
+          playerId: data.playerId,
+          guess: data.guess,
+          cows: score.c,
+          bulls: score.b,
+          isBotTurn: data.isBotTurn,
+          isWinning: score.b === 4 ? true : false
+        };
 
         GameTurn
-          .create({
-            gameId: data.gameId,
-            playerId: data.playerId,
-            guess: data.guess,
-            isBotTurn: data.isBotTurn,
-            cows: result.c,
-            bulls: result.b,
-            isWinning: result.b === 4 ? true : false
-          })
+          .create(turnData)
           .done(function (errors, turn) {
             if (null !== errors) {
               return failCallback.call(null, game, errors)
             }
 
-            if (true === turn.isWinning) {
-              game.isOver = true;
-              return game.save(function (err) {
-                successCallback.call(null, game, turn);
-              });
-            }
+            game.isHostTurn = !game.isHostTurn;
+            game.isOver = turn.isWinning;
+
+            return game.save(function (err) {
+              successCallback.call(null, game, turn);
+            });
+
             successCallback.call(null, game, turn);
           })
       })

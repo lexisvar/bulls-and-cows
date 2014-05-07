@@ -8,32 +8,34 @@
       gameId = session.game;
 
     // get game with turns and send them to user
-    Game.getWithTurns(gameId,
-      function (game, turns) {
-        // if the game is not found
-        if (null === game) {
-          return res.json({
-            error: 'Game not found'
-          })
-        }
+    Game.getWithTurns(gameId, function (game, turns) {
 
-        Game.secure(game);
-
-        // if the game is over, remove the player session for it
-        if (game.isOver) {
-          Session.setGame(req, null);
-        }
-
-        // subscribe for this game specifically
-        else {
-          Game.subscribe(req.socket, game);
-        }
-
+      // if the game is not found
+      if (null === game) {
         return res.json({
-          game: game,
-          turns: turns
+          error: 'Game not found'
         })
-      })
+      }
+
+      // if the game is over, remove the player session for it
+      if (game.isOver) {
+        Session.setGame(req, null);
+      } else {
+        // socket tasks
+        SocketService
+          .gameJoin(game.id, req.socket)
+          .lobbyLeave(req.socket);
+      }
+
+
+      Game.secure(game);
+      var response = {
+        game: game,
+        turns: turns
+      }
+
+      return res.json(response);
+    })
   }
 
   $.turn = function (req, res) {
@@ -49,17 +51,18 @@
 
     GameTurn.playTurn(data,
       function turnSuccess(game, turn) {
-        SocketService.gameTurn(game.id, turn);
-
-        // if this is the winning turn -> destroy the player session
-        if (turn.isWinning) {
-          Session.setGame(req, null);
+        var message = {
+          game: {
+            isOver: game.isOver,
+            isHostTurn: game.isHostTurn
+          },
+          turn: turn
         }
 
+        SocketService.gameTurn(game.id, message);
         return res.json(turn);
       },
-
-      function turnFail(game, turnErrors) {
+      function turnFail(game, errors) {
         if (true === game.isOver) {
           return res.json({
             error: 'The game is over!'
@@ -73,7 +76,7 @@
         }
 
         return res.json({
-          errors: Errors.format(GameTurn, turnErrors)
+          errors: Errors.format(GameTurn, errors)
         })
       });
   }
@@ -130,16 +133,16 @@
     }
 
     Game.join(data, function (errors, game) {
-      if (!game || session.id !== game.guestId) {
-        return res.json({
-          error: 'The game is not found or is already full'
-        });
-      }
-
       if (errors) {
         return res.json({
           errors: Errors.format(Game, errors)
         })
+      }
+
+      if (!game || session.id !== game.guestId) {
+        return res.json({
+          error: 'The game is not found or is already full'
+        });
       }
 
       Session.setGame(req, game);
@@ -157,17 +160,17 @@
   $.secret = function (req, res) {
     var gameId = req.param('id');
 
-    Game.findOne(gameId)
-      .then(function (game) {
-        if (!game || game.isMultiplayer) {
-          return res.json({
-            message: 'These are not the droids you are looking for!'
-          })
-        }
-
+    Game.findOne(gameId).then(function (game) {
+      console.log(arguments);
+      if (!game || game.isMultiplayer) {
         return res.json({
-          message: 'Hacker mode enabled!' + "\n" + 'The secret number is ' + game.hostSecret
+          message: 'These are not the droids you are looking for!'
         })
+      }
+
+      return res.json({
+        message: 'Hacker mode enabled!' + "\n" + 'The secret number is ' + game.hostSecret
       })
+    })
   }
 })(module.exports)

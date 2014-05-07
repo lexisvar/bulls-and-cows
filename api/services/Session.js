@@ -13,7 +13,7 @@
       id: req.session.playerId || null,
       name: req.session.name || null,
       game: req.session.game || null,
-      isHost: req.session.isHost || null
+      isHost: req.session.isHost ? true : false
     }
 
     return undefined !== data[param] ? data[param] : data;
@@ -52,6 +52,6 @@
     }
 
     req.session.game = game.id;
-    req.session.isHost = game.hostPlayerId === req.session.playerId;
+    req.session.isHost = game.hostId === req.session.playerId ? true : false;
   }
 })(module.exports)
