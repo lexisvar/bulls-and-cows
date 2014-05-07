@@ -10,6 +10,7 @@ angular.module('BullsAndCows').directive('body', [
       link: function bodyResize(scope, element, attributes) {
         var heightConstraintsSum = 0,
           resize, property, value;
+
         var properties = ['margin-top', 'margin-bottom', 'padding-top', 'padding-left'];
 
         // remove margin and padding from calculation

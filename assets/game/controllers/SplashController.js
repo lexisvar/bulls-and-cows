@@ -17,12 +17,15 @@ angular.module('BullsAndCows').controller('SplashController', [
       showWelcome: false,
       showNameForm: false,
       isReturning: false,
+      animateWelcome: false,
       error: null,
       name: null
     };
 
     // timeout to redirect to lobby after recognizing the player
-    var lobbyRedirectTimeout = 2000;
+    var lobbyRedirectTimeout = 1200;
+    var lobbyWelcomeTimeout = 500;
+    var welcomeStarted = false;
 
     /**
      * Displays the Welcome message and schedules a redirect to the Lobby
@@ -30,15 +33,23 @@ angular.module('BullsAndCows').controller('SplashController', [
      *                               or a returning one
      */
     var displayWelcome = function (isReturning) {
+      if (welcomeStarted)
+        return false;
+
       $scope.state = {
         isReturning: isReturning ? true : false,
         showWelcome: true,
+        animateWelcome: false,
         showNameForm: false,
         error: null
       }
 
+      welcomeStarted = true;
       $timeout(function () {
-        $location.path('/lobby')
+        $scope.state.animateWelcome = true;
+        $timeout(function () {
+          $location.path('/lobby');
+        }, lobbyWelcomeTimeout);
       }, lobbyRedirectTimeout);
     }
 

@@ -115,6 +115,10 @@ module.exports = function (grunt) {
     // LESS
     less: {
       dev: {
+        options: {
+          sourceMap: true,
+          sourceMapURL: '/css/'
+        },
         files: [{
           expand: true,
           cwd: 'assets/css/',
@@ -298,9 +302,9 @@ module.exports = function (grunt) {
   // Compile assets
   grunt.registerTask('compileAssets', [
     'clean:dev',
-    'less:dev',
     'copy:dev',
     'copy:shared',
+    'less:dev',
     'jade:templates'
   ]);
 

@@ -1,17 +1,17 @@
 // Splash screen
 .splash
-  button(ng-click="continueToLobby()") Continue
+  button(ng-click="continueToLobby()" ng-hide="state.showWelcome") Continue to Lobby
 
 // Enter name dialogue
-.enterName(ng-show="state.showNameForm")
-  form(ng-submit="registerPlayer()")
-    p.error(ng-show="showError()") {{state.error}}
-    label(for="player-name") Enter name:
-      input(id="player-name" ng-model="state.name" ng-class="{error: showError()}")
+.enterName(ng-class="{visible: state.showNameForm}")
+  form(ng-submit="registerPlayer()" ng-class="{error: showError()}")
+    label(for="player-name") Enter name
+      p.error(ng-show="showError()") {{state.error}}
+      input(id="player-name" placeholder="Name, alias, whatever..." ng-model="state.name" ng-class="{error: showError()}")
     button(type="submit") OK
 
 // Welcome message
-.welcomeMessage(ng-show="state.showWelcome")
+.welcomeMessage(ng-show="state.showWelcome" ng-class="{animate: state.animateWelcome}")
   h1 Hey, {{getName()}}
   div(ng-switch="state.isReturning")
     h3(ng-switch-when="true")
