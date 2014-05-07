@@ -15,7 +15,10 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     $scope.lobby = {
       gameId: undefined,
-      joinDisabled: true
+      joinDisabled: true,
+      isCooperative: false,
+      errors: null,
+      secret: ''
     }
 
     $scope.game = {
@@ -43,6 +46,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
      * @return {void}
      */
     var resetGameErrors = function () {
+      $scope.lobby.errors = null;
       $scope.game.errors = {}
     }
 
@@ -61,9 +65,14 @@ angular.module('BullsAndCows').controller('LobbyController', [
      * @param  {integer} gameId The id of the game
      * @return {void}
      */
-    $scope.selectGame = function (gameId) {
-      $scope.lobby.gameId = $scope.lobby.gameId === gameId ? undefined : gameId;
-      $scope.lobby.joinDisabled = undefined === $scope.lobby.gameId ? true : false;
+    $scope.selectGame = function (gameId, isCooperative) {
+      var sameGame = gameId === $scope.lobby.gameId;
+
+      $scope.lobby.gameId = sameGame ? undefined : gameId;
+      $scope.lobby.joinDisabled = sameGame ? true : false;
+      $scope.lobby.isCooperative = sameGame ? false : isCooperative;
+
+      console.log($scope.lobby);
     }
 
     /**
@@ -87,6 +96,10 @@ angular.module('BullsAndCows').controller('LobbyController', [
         return true;
 
       return Object.keys($scope.game.errors).length > 0;
+    }
+
+    $scope.lobbyHasErrors = function () {
+      return $scope.lobby.errors !== null;
     }
 
     $scope.startGame = function () {
@@ -139,12 +152,20 @@ angular.module('BullsAndCows').controller('LobbyController', [
     }
 
     $scope.joinGame = function () {
-      var gameId = $scope.lobby.gameId;
-      Server.gameJoin(gameId, function (response) {
-        console.log(response);
-        $location.path('/game/' + gameId);
-        $scope.$apply();
-      });
+      var data = {
+        id: $scope.lobby.gameId,
+        secret: $scope.game.secret
+      }
+
+      resetGameErrors();
+      Server.gameJoin(data,
+        function joinGameSuccess(response) {
+          $location.path('/game/' + data.id);
+          $scope.$apply();
+        },
+        function joinGameFail(errors) {
+          $scope.lobby.errors = errors.guestSecret;
+        });
     }
   }
 ]);

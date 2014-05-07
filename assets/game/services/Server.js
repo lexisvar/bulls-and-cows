@@ -184,16 +184,12 @@ angular.module('BullsAndCows').service('Server', [
       })
     }
 
-    $.gameJoin = function (gameId, successCallback, errorHandler) {
-      var data = {
-        id: gameId
-      }
-
+    $.gameJoin = function (data, successCallback, errorHandler) {
       $root.loadingShow();
       $socket.get('/game/join', data, function (response) {
         console.debug('[SERVER] Game Join:', response);
         var success = function () {
-          $.gameEnter(gameId, successCallback);
+          $.gameEnter(data.id, successCallback);
         }
 
         $root.loadingHide();

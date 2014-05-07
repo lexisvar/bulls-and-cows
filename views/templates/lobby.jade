@@ -9,13 +9,16 @@ section.games
     tbody
       tr(ng-hide="hasGames()")
         td(colspan="4") There're no games at the moment
-      tr(ng-show="hasGames()" ng-repeat="game in getGames()" ng-click="selectGame(game.id)" ng-class="{current: isCurrentlySelectedGame(game.id)}")
+      tr(ng-show="hasGames()" ng-repeat="game in getGames()" ng-click="selectGame(game.id, game.isCooperative)" ng-class="{current: isCurrentlySelectedGame(game.id)}")
         td {{game.id}}
         td {{game.title}}
         td {{game.host}}
         td(ng-switch="game.isCooperative")
           span(ng-switch-when="true") Cooperative
           span(ng-switch-default) Player vs Player
+  .secret(ng-show="!lobby.isCooperative")
+    div(ng-show="lobbyHasErrors()") {{lobby.errors}}
+    input(ng-model="game.secret" ng-class="{error: lobbyHasErrors()}")
   .buttons
     button(ng-click="toggleGameForm()") Create New Game
     button(ng-click="joinGame()" ng-disabled="lobby.joinDisabled") Join Game
