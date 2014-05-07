@@ -223,7 +223,11 @@
    */
   $.gameUnsubscribeAll = function (gameId) {
     var room = gameRoom(gameId)
-    sails.io.clients(room).leave(room);
+    var sockets = sails.io.sockets.clients(room);
+    for (var i in sockets) {
+      sockets[i].leave(room);
+    }
+
     return $;
   }
 

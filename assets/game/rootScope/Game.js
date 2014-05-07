@@ -3,8 +3,8 @@
  * on the game screen
  */
 angular.module('BullsAndCows').run([
-  '$rootScope',
-  function ($root) {
+  '$rootScope', 'Server',
+  function ($root, Server) {
 
     /**
      * Container for an ongoing game's data in structure
@@ -99,6 +99,7 @@ angular.module('BullsAndCows').run([
             $root.game.data.isOver = true;
             $root.game.winner = turn.playerId;
             $root.game.winnerIsBot = turn.isBotTurn;
+            Server.gameEnd(turn.gameId);
           }
 
           $root.game.turnCount++;

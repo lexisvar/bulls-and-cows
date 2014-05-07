@@ -1,6 +1,31 @@
 angular.module('BullsAndCows').controller('FrontController', [
   '$scope', '$rootScope', '$location', '$route', '$routeParams', 'Server',
   function ($scope, $root, $location, $route, $routeParams, Server) {
+
+    // extracts gameId from route
+    var extractId = function (path) {
+      var gameIdRegex = /\/game\/([\d]+)/gm;
+      try {
+        return gameIdRegex.exec(location)[1];
+      } catch (e) {
+        return null;
+      }
+    }
+
+    /**
+     * Goes to a location, if the location matches the current
+     * one call $route.reload();
+     * @param  {string} path Path URI to go to
+     * @return {void}
+     */
+    var goTo = function (path) {
+      if ($location.path() === path) {
+        return $route.reload();
+      }
+
+      return $location.path(path);
+    }
+
     /**
      * Test to see if we can identify the user, otherwise
      * redirect to Splash Screen
@@ -9,16 +34,6 @@ angular.module('BullsAndCows').controller('FrontController', [
 
       // if the player is identified
       function hasIdCallback(response) {
-
-        // extracts gameId from route
-        var extractId = function (path) {
-          var gameIdRegex = /\/game\/([\d]+)/gm;
-          try {
-            return gameIdRegex.exec(location)[1];
-          } catch (e) {
-            return null;
-          }
-        }
 
         // set the player game from route params
         var _gameId = extractId($location.$$path);
@@ -45,8 +60,7 @@ angular.module('BullsAndCows').controller('FrontController', [
 
               // if already in the GameController reload location to
               // apply $rootScope.game changes to GameController
-              gameLocation === $location.path() ? $route.reload() : $location.path(gameLocation);
-
+              goTo(gameLocation);
               $root.appLoadComplete();
               $root.$apply();
             },
@@ -60,18 +74,19 @@ angular.module('BullsAndCows').controller('FrontController', [
               $root.playerSetGame(originalGameId, true);
 
               // redirect to home page
-              $location.path('/');
+              goTo('/');
               $root.appLoadComplete();
               $root.$apply();
             })
         }
 
         // no game
+        goTo('/');
         $root.appLoadComplete();
       },
       // if the player is anonymouse -> redirect to Splash
       function noIdCallback(response) {
-        $location.path('/');
+        goTo('/');
         $root.appLoadComplete();
       });
   }

@@ -214,4 +214,25 @@
       })
     })
   }
+
+  /**
+   * Cleans up the player's game session data and unsubscribes
+   * them from the game room
+   */
+  $.end = function (req, res) {
+    var gameId = parseInt(req.param('id')),
+      sessionGame = Session.getGame(req);
+
+    SocketService.gameLeave(gameId || sessionGame, req.socket);
+
+    if (sessionGame === gameId) {
+      Session.setGame(req, null);
+    }
+
+    return res.json({
+      message: 'Game left'
+    })
+  }
+
+
 })(module.exports)

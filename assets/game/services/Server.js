@@ -218,6 +218,19 @@ angular.module('BullsAndCows').service('Server', [
       })
     }
 
+    /**
+     * Send a request to the backend to unsubscribe the user' socket
+     * from the game room and clear their game session data
+     * @param {integer} gameId  The id of the game to unsubscribe from
+     * @return {void}
+     */
+    $.gameEnd = function (gameId) {
+      var data = {
+        id: gameId
+      }
+      $socket.get('/game/end', data);
+    }
+
     return $;
   }
 ])
