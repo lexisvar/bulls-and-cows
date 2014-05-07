@@ -40,9 +40,10 @@ angular.module('BullsAndCows').service('PlayModes', function () {
   }
 
   /**
-   * A mode accessor by Id
-   * @param  {string} modeId The name of the play mode
-   * @return {[type]}        [description]
+   * A play mode accessor by Id
+   *
+   * @param  {string} modeId :: The name of the play mode
+   * @return {object}        :: The selected play mode
    */
   $.get = function (modeId) {
     return $.all[modeId];
@@ -50,8 +51,9 @@ angular.module('BullsAndCows').service('PlayModes', function () {
 
   /**
    * Checks if a specific modeId is a valid play mode
-   * @param  {string}  modeId The name of the play mode
-   * @return {Boolean}        Return true if a valid mode
+   *
+   * @param  {string}  modeId :: The id of the play mode
+   * @return {Boolean}
    */
   $.isValid = function (modeId) {
     return undefined !== $.all[modeId];
@@ -59,10 +61,10 @@ angular.module('BullsAndCows').service('PlayModes', function () {
 
   /**
    * Formats an object for a "new game" request
-   * @param  {string} mode   The id of the play mode
-   * @param  {string} title  Game title
-   * @param  {string} secret Host secret
-   * @return {object}       Formatted game request object
+   * @param  {string} mode   :: The id of the play mode
+   * @param  {string} title  :: Game title
+   * @param  {string} secret :: Host secret
+   * @return {object}        :: Formatted game request object
    */
   $.formatGameObject = function (mode, title, secret) {
     var mode = $.get(mode);

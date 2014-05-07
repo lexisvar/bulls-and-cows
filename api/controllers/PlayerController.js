@@ -35,16 +35,11 @@
 
   /**
    * Return the number of players online
-   * @todo  add socket subscription
    */
   $.online = function (req, res) {
     return res.json({
       online: SocketService.getOnline()
     });
-  }
-
-  $.server = function (req, res) {
-    res.json(Engine);
   }
 
 })(module.exports);

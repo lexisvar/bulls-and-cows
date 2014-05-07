@@ -13,8 +13,8 @@
    * the total, destroy the counter instance and close all open
    * games where the user was either a guest or a host
    *
-   * @param  {object}   session The session object
-   * @param  {boolean}  connect Count towards connect or disconnect
+   * @param  {object}   session :: The session object
+   * @param  {boolean}  connect :: True if called onConnect
    */
   $.countConnections = function (session, connect) {
     var id = parseInt(session.playerId);
@@ -54,24 +54,34 @@
 
   /**
    * Counts the amount of total identified players in the game
-   * @param  {boolean} increase Increase/Decrease => true/false
+   * @param  {boolean} increase :: True if the amount should increase
    */
   $.countOnline = function (increase) {
     totalUsers += true === increase ? 1 : -1;
   }
 
   /**
-   * Return the number of online users
+   * Return the number of UNIQUE online users
    * @return {integer}
    */
   $.getOnline = function () {
     return totalUsers;
   }
 
-  /**
-   * Lobby events
-   */
+  /*****************************************
+  #
+  #           Lobby event emitters
+  #
+  ******************************************/
 
+  /**
+   * Introduce a new game object to the lobby, after
+   * selecting the player name that hosted it from
+   * the database
+   *
+   * @param  {object} game :: A valid game object
+   * @return {SocketSerice}
+   */
   $.lobbyIntroduce = function (game) {
     if (!game.isMultiplayer)
       return $;
@@ -93,55 +103,128 @@
     return $;
   }
 
-  $.lobbyRemoveGame = function (id) {
+  /**
+   * Remove a game from the lobby
+   * @param  {integer} id :: the id of the game to be removed
+   * @return {SocketService}
+   */
+  $.lobbyRemoveGame = function (gameId) {
     sails.io.sockets. in ('lobby')
-      .emit('removeGame', id);
+      .emit('removeGame', gameId);
     return $;
   }
 
+  /**
+   * Subscribe a user to the lobby
+   * @return {SocketService}
+   */
   $.lobbyJoin = function (socket) {
     socket.join('lobby');
     return $;
   }
 
+  /**
+   * Unsubscribe a user from the lobby
+   * @return {SocketService}
+   */
   $.lobbyLeave = function (socket) {
     socket.leave('lobby');
     return $;
   }
 
-  /**
-   * Game events
-   */
+  /*****************************************
+  #
+  #           Game event emitters
+  #
+  ******************************************/
 
+  /**
+   * Generate a game room name
+   * @param  {integer} gameId
+   * @return {string}
+   */
   var gameRoom = function (gameId) {
     return 'game_' + gameId;
   }
 
+  /**
+   * Subscribes a user socket to a specific game room
+   *
+   * @param  {integer} gameId
+   * @param  {io.socket} socket
+   * @return {SocketService}
+   */
   $.gameJoin = function (gameId, socket) {
     socket.join(gameRoom(gameId));
     return $;
   }
 
+  /**
+   * Unsubscribe a user socket from a specific game room
+   *
+   * @param  {integer} gameId
+   * @param  {io.socket} socket
+   * @return {SocketService}
+   */
   $.gameLeave = function (gameId, socket) {
     socket.leave(gameRoom(gameId));
     return $;
   }
 
+  /**
+   * Notifies the host of a game that another player has
+   * joined the game
+   *
+   * @param  {integer} gameId
+   * @param  {object} data      :: Contains the guest' name and player Id
+   * @param  {io.socket} socket :: Socket of the guest user
+   * @return {SocketService}
+   */
   $.gameGuestArrived = function (gameId, data, socket) {
     socket.broadcast.to(gameRoom(gameId))
       .emit('guestArrived', data);
     return $;
   }
 
+  /**
+   * Emits to all players in game that a new turn has been played out
+   * @param  {integer} gameId
+   * @param  {object} data   :: Contains current game state and the turn object
+   * @return {SocketService}
+   */
   $.gameTurn = function (gameId, data) {
     sails.io.sockets. in (gameRoom(gameId))
       .emit('turn', data);
     return $;
   }
 
+  /**
+   * Emits to players in the room that the other player has disconnected
+   * and the game has closed prematurely
+   *
+   * @param  {integer} gameId
+   * @param  {object} data   :: Contains current game state
+   * @return {SocketService}
+   
+   */
   $.gamePrematureClose = function (gameId, data) {
     sails.io.sockets. in (gameRoom(gameId))
       .emit('prematureClose', data);
+
+    return $;
+  }
+
+  /**
+   * Unsubscribe all sockets from a game room. Called when a premature
+   * game close is accomplished
+   *
+   * @param  {integer} gameId
+   * @return {SocketService}
+   */
+  $.gameUnsubscribeAll = function (gameId) {
+    var room = gameRoom(gameId)
+    sails.io.clients(room).leave(room);
+    return $;
   }
 
 

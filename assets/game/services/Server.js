@@ -6,9 +6,10 @@ angular.module('BullsAndCows').service('Server', [
     /**
      * Handles success/error callback calling after a request to
      * the server. Commonly private method
-     * @param  {object}   response     The server response
-     * @param  {Function} callback     Success callback
-     * @param  {function} errorHandler Error callback
+     *
+     * @param  {object}   response     :: The server response
+     * @param  {Function} callback     :: Success callback
+     * @param  {function} errorHandler :: Error callback
      * @return {void}
      */
     var handleResponse = function (response, callback, errorHandler) {
@@ -28,8 +29,8 @@ angular.module('BullsAndCows').service('Server', [
      * $rootScope, if the user is already identified, return
      * $root.getPlayerData with the success callback
      *
-     * @param  {function} hasIdCallback Callback if identified user
-     * @param  {function} noIdCallback  Callback if unidentified user
+     * @param  {function} hasIdCallback :: Callback if identified user
+     * @param  {function} noIdCallback  :: Callback if unidentified user
      * @return {void}
      */
     $.playerApplyData = function (hasIdCallback, noIdCallback) {
@@ -48,7 +49,8 @@ angular.module('BullsAndCows').service('Server', [
 
     /**
      * Grabs player info from the server
-     * @param  {Function} callback Callback after result is receinved
+     *
+     * @param  {Function} callback :: Callback receiving the server response
      * @return {void}
      */
     $.playerGet = function (callback) {
@@ -63,9 +65,10 @@ angular.module('BullsAndCows').service('Server', [
 
     /**
      * Register a player with the provided data
-     * @param  {object}   data         Player parameters (usually only name)
-     * @param  {function} callback     Success callback
-     * @param  {funciton} errorHandler Error callback
+     *
+     * @param  {object}   data         :: Player parameters (usually only name)
+     * @param  {function} callback     :: Success callback
+     * @param  {funciton} errorHandler :: Error callback
      * @return {void}
      */
     $.playerRegister = function (data, callback, errorHandler) {
@@ -90,7 +93,7 @@ angular.module('BullsAndCows').service('Server', [
      * Also fetches and a list of existing games and passes them
      * to a the provided callback
      *
-     * @param  {Function} callback
+     * @param  {Function} :: callback
      * @return {void}
      */
     $.lobbyJoin = function (callback) {
@@ -106,6 +109,7 @@ angular.module('BullsAndCows').service('Server', [
     /**
      * Send a request to the backend to unsubscribe the user' socket
      * from any incoming lobby notifaictions
+     *
      * @return {void}
      */
     $.lobbyLeave = function () {
@@ -114,9 +118,9 @@ angular.module('BullsAndCows').service('Server', [
 
     /**
      * Sends a message to the server to create a game
-     * @param  {object}   data            Properly formatted create game request data
-     * @param  {function} successCallback A function to call on success
-     * @param  {function} errorHandler    A function to call on error
+     * @param  {object}   data            :: Properly formatted create game request data
+     * @param  {function} successCallback
+     * @param  {function} errorHandler
      * @return {void}
      */
     $.gameCreate = function (data, successCallback, errorHandler) {
@@ -132,10 +136,11 @@ angular.module('BullsAndCows').service('Server', [
     /**
      * Enter a game by grabbing its info from the server and apply it to
      * the $rootScope
-     * @param  {function} callback An optional callback to be executed afterwords
+     * @param  {function} successCallback :: (Optional)
+     * @param  {function} errorHandler    :: (Optional)
      * @return {void}
      */
-    $.gameEnter = function (gameId, callback, errorCallback) {
+    $.gameEnter = function (gameId, successCallback, errorHandler) {
       $root.loadingShow();
       $socket.get('/game/enter/' + gameId, function (response) {
         console.debug('[SERVER] Game Enter:', response);
@@ -144,20 +149,20 @@ angular.module('BullsAndCows').service('Server', [
 
         // if there's an error (e.g. game not found)
         if (response.error) {
-          return errorCallback.call(null, response.error)
+          return errorHandler.call(null, response.error)
         }
 
         $root.gameSet(response.game);
         $root.gameSetTurns(response.turns);
-        'function' === typeof callback ? callback.call() : undefined;
+        'function' === typeof successCallback ? successCallback.call() : undefined;
       })
     }
 
     /**
      * Submit game turn to the server
-     * @param  {object} turn              Turn data, contains "guess" and "isBotTurn"
-     * @param  {function} successCallback Callback on success
-     * @param  {function} errorHandler    Error handler
+     * @param  {object} turn              :: Turn data, contains "guess" and "isBotTurn"
+     * @param  {function} successCallback
+     * @param  {function} errorHandler
      * @return {void}
      */
     $.gamePlayTurn = function (turn, successCallback, errorHandler) {
@@ -170,6 +175,14 @@ angular.module('BullsAndCows').service('Server', [
       })
     }
 
+    /**
+     * Gets the game' secret number from the server - only works in
+     * single player mode
+     *
+     * @param  {integer}   gameId   :: The id of the game
+     * @param  {Function}  callback :: (Required)
+     * @return {void}
+     */
     $.gameSecret = function (gameId, callback) {
       var data = {
         id: gameId
@@ -184,6 +197,14 @@ angular.module('BullsAndCows').service('Server', [
       })
     }
 
+    /**
+     * Joins a player to to an existing multiplayer game
+     *
+     * @param  {object}   data            :: Contains game id and possibly guest secret
+     * @param  {function} successCallback
+     * @param  {function} errorHandler
+     * @return {void}
+     */
     $.gameJoin = function (data, successCallback, errorHandler) {
       $root.loadingShow();
       $socket.get('/game/join', data, function (response) {

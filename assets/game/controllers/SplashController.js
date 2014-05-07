@@ -9,8 +9,10 @@ angular.module('BullsAndCows').controller('SplashController', [
     $scope.getName = $root.playerGetName;
 
     /**
-     * Controller state params
+     * Models
      */
+
+    // state flags for the displayed dialogues and form errors
     $scope.state = {
       showWelcome: false,
       showNameForm: false,
@@ -19,6 +21,7 @@ angular.module('BullsAndCows').controller('SplashController', [
       name: null
     };
 
+    // timeout to redirect to lobby after recognizing the player
     var lobbyRedirectTimeout = 2000;
 
     /**
@@ -42,6 +45,7 @@ angular.module('BullsAndCows').controller('SplashController', [
     /**
      * Checks if a player is ready to continu to the lobby, if they are
      * show them the Welcome screen, otherwise show the "Enter name" form
+     * @return {void}
      */
     $scope.continueToLobby = function () {
       if (true === $root.playerHasId()) {
@@ -54,6 +58,7 @@ angular.module('BullsAndCows').controller('SplashController', [
     /**
      * Register a player, show erros on fail and welcome message otherwise,
      * successful registration registers the player values in the $rootScope
+     * @return {void}
      */
     $scope.registerPlayer = function () {
       var data = {
@@ -74,8 +79,10 @@ angular.module('BullsAndCows').controller('SplashController', [
     }
 
     /**
-     * A state accessor returning true if there're errors to display on
-     * the name form
+     * A state accessor returning true if there're errors to display
+     * on the registration form
+     *
+     * @return {boolean}
      */
     $scope.showError = function () {
       return $scope.state.error === null ? false : true;

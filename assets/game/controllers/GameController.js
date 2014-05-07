@@ -58,7 +58,7 @@ angular.module('BullsAndCows').controller('GameController', [
      * the game NOT being a multiplayer or having a guest
      * join the game
      *
-     * @return {Boolean} [description]
+     * @return {Boolean}
      */
     $scope.isWaiting = function () {
       if ($root.gameIsMultiplayer() && !$root.gameIsOver()) {
@@ -70,7 +70,7 @@ angular.module('BullsAndCows').controller('GameController', [
 
     /**
      * Checks if there's an error message to display
-     * @return {Boolean} True if there is
+     * @return {Boolean}
      */
     $scope.hasError = function () {
       return $scope.data.error === null ? false : true;
@@ -78,7 +78,7 @@ angular.module('BullsAndCows').controller('GameController', [
 
     /**
      * Checks if there're any turns played for this game
-     * @return {Boolean} True if more than 0
+     * @return {Boolean}
      */
     $scope.hasTurns = function () {
       return $root.gameGetTurnsCount() > 0 ? true : false;
@@ -86,12 +86,16 @@ angular.module('BullsAndCows').controller('GameController', [
 
     /**
      * Checks if a the player is the game host
-     * @return {Boolean} True if is host
+     * @return {Boolean}
      */
     $scope.isHost = function () {
       return $root.playerGetId() === $root.gameGetHostId();
     }
 
+    /**
+     * Returns true if the bot should play this turn
+     * @return {Boolean}
+     */
     $scope.isBotTurn = function () {
       // if not a multiplayer and with bot
       if (!$root.gameIsMultiplayer() && $root.gameIsWithBot()) {
@@ -113,6 +117,10 @@ angular.module('BullsAndCows').controller('GameController', [
       return false;
     }
 
+    /**
+     * Returns true if its the player's turn to play
+     * @return {Boolean}
+     */
     $scope.isPlayerTurn = function () {
       if ($root.gameIsMultiplayer()) {
         return $scope.isHost() === $root.gameIsHostTurn();
@@ -154,6 +162,12 @@ angular.module('BullsAndCows').controller('GameController', [
         });
     }
 
+    /**
+     * Request the game' secret number from the server and
+     * alerts it to the screen
+     *
+     * @return {void}
+     */
     $scope.getSecret = function () {
       Server.gameSecret($root.gameGetId(), function (message) {
         alert(message);

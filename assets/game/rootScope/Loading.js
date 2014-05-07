@@ -1,3 +1,7 @@
+/**
+ * Extension of the $rootScope for handling the
+ * loading message widget
+ */
 angular.module('BullsAndCows').run([
   '$rootScope',
   function ($root) {

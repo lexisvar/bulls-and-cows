@@ -1,14 +1,25 @@
-var root;
+/**
+ * Extension of the $rootScope for handling functionality
+ * on the game screen
+ */
 angular.module('BullsAndCows').run([
   '$rootScope',
   function ($root) {
-    root = $root;
+
     /**
      * Container for an ongoing game's data in structure
      * @type {Object}
      */
     $root.game = {}
 
+    /**
+     * Sets $rootScope.game properties based on game object
+     * passed to the method, if null, the default values
+     * will be applied instead
+     *
+     * @param  {object} game Optional server provided game object
+     * @return {void}
+     */
     $root.gameSet = function (game) {
       $root.apply(function () {
         var isGame = 'object' === typeof game;
@@ -30,15 +41,16 @@ angular.module('BullsAndCows').run([
       })
     }
 
-    // set defaults to object with by having no game specified
+    // gameSet with no arguments -> set defaults
     $root.gameSet();
 
-    $root.gameStart = function (data) {
-      $root.apply(function () {
-        $root.game.data = data;
-      })
-    }
-
+    /**
+     * Push a game turn into the turn queues, as well as updating
+     * the game's isOver and isHostTurn states
+     *
+     * @param  {object} data Contains game and turn data
+     * @return {void}
+     */
     $root.gameAddTurn = function (data) {
       $root.apply(function () {
         $root.game.data.isOver = data.game.isOver;
@@ -47,6 +59,13 @@ angular.module('BullsAndCows').run([
       return $root.gameSetTurns([data.turn]);
     }
 
+    /**
+     * Adds information for a joined guest player, is triggered
+     * by socket.on('guestArrived')
+     *
+     * @param  {object} data Contains guest name and player id
+     * @return {void}
+     */
     $root.gameApplyGuestPlayer = function (data) {
       $root.apply(function () {
         $root.game.data.guest = data.guest;
@@ -54,6 +73,15 @@ angular.module('BullsAndCows').run([
       })
     }
 
+    /**
+     * Process an array of turns and apply them to the either the
+     * host or guest turn queues based on turn player id and the
+     * game's host id. In addition to that, set game isOver, winner
+     * and winnerIsBot flag, when a winning turn is found
+     *
+     * @param  {array} turns  An array of turn objects
+     * @return {void}
+     */
     $root.gameSetTurns = function (turns) {
       $root.apply(function () {
         var i, turn;
@@ -78,6 +106,12 @@ angular.module('BullsAndCows').run([
       })
     }
 
+    /**
+     * Checks if the last played turn in the guestTurns queue
+     * was played by a bot
+     *
+     * @return {boolean} True if a bot turn
+     */
     $root.gameLastTurnIsBot = function () {
       var last = $root.game.guestTurns.length - 1,
         turn = $root.game.guestTurns[last];
@@ -86,7 +120,15 @@ angular.module('BullsAndCows').run([
     }
 
     /**
-     * Multiple data accessors continue below!
+     * A getter for the name of the winner
+     * @return {string}
+     */
+    $root.gameGetWinnerName = function () {
+      return $root.game.winnerId === $root.game.data.hostId ? $root.game.data.host : $root.game.data.guest;
+    }
+
+    /**
+     * Multiple simple data accessors continue below!
      */
     $root.gameIsLoaded = function () {
       return $root.game.isLoaded;
@@ -150,10 +192,6 @@ angular.module('BullsAndCows').run([
 
     $root.gameIsOver = function () {
       return $root.game.data.isOver;
-    }
-
-    $root.gameGetWinnerName = function () {
-      return $root.game.winnerId === $root.game.data.hostId ? $root.game.data.host : $root.game.data.guest;
     }
 
     $root.gameIsWinnerBot = function () {

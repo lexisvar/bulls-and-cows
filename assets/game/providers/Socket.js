@@ -26,9 +26,9 @@ angular.module('BullsAndCows', [])
      * e.g.
      *    `socket.get('/user/3', Stats.populate)`
      *
-     * @param {String} url    ::    destination URL
+     * @param {String} url     ::    destination URL
      * @param {Object1} params ::    parameters to send with the request [optional]
-     * @param {Function} cb   ::    callback function to call when finished [optional]
+     * @param {Function} cb    ::    callback function to call when finished [optional]
      */
     socketClass.prototype.get = function (url, data, cb) {
       return this.request(url, data, cb, 'get');

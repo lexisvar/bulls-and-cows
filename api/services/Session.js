@@ -36,6 +36,11 @@
     return undefined === req.session.playerId ? false : true;
   }
 
+  /**
+   * Returns the id of the current game saved in the session
+   * @param  {requestObject} req
+   * @return {integer|null}
+   */
   $.getGame = function (req) {
     return req.session.game || null;
   }

@@ -290,6 +290,7 @@ var _ = require('lodash');
         _.forEach(games, function (game) {
           SocketService
             .lobbyRemoveGame(game.id)
+            .gameUnsubscribeAll(game.id)
             .gamePrematureClose(game.id, withData);
         })
       })

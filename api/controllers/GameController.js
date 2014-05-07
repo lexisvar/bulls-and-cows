@@ -1,5 +1,14 @@
 (function ($) {
-
+  /**
+   * Enter a game room and provide either errors if
+   * the game is not found or full information about the
+   * game and the turns played thus far.
+   *
+   * In addition, subscribe the user to game room events.
+   *
+   * This kind of functionality allows for users to join
+   * as observers
+   */
   $.enter = function (req, res) {
     var session = Session.get(req);
     var gameId = parseInt(req.param('id'));
@@ -27,7 +36,6 @@
           .lobbyLeave(req.socket);
       }
 
-
       Game.secure(game);
       var response = {
         game: game,
@@ -38,6 +46,14 @@
     })
   }
 
+  /**
+   * This action is called when a new game turn is played
+   * It provides errors for Game.isOver state, not your
+   * turn to play errors.
+   *
+   * On success emits the newly database saved turn to
+   * all users subscribed to the game room
+   */
   $.turn = function (req, res) {
     var session = Session.get(req);
 
@@ -81,6 +97,13 @@
       });
   }
 
+  /**
+   * Thos actopm os ca;;ed wjem a mew ga,e os created/
+   * Ot prevents users with existing games to create new
+   * ones and sends a formal error message about it, which
+   * should be handled by the frontend with a redirect to
+   * the game screen
+   */
   $.create = function (req, res) {
     // if already have game session, return error
     if (null !== Session.getGame(req)) {
@@ -119,7 +142,21 @@
     });
   }
 
+  /**
+   * This action is called when a player joins a multiplayer
+   * game instance. It handles errors as well as setting proper
+   * Session info about the player's current game
+   */
   $.join = function (req, res) {
+    // if already have game session, return error
+    if (null !== Session.getGame(req)) {
+      return res.json({
+        error: {
+          hasGame: 'You can play only one game at a time'
+        }
+      })
+    }
+
     var session = Session.get(req);
     var data = {
       id: req.param('id'),
@@ -147,16 +184,15 @@
 
       Session.setGame(req, game);
       Game.secure(game);
-
-      SocketService
-        .gameJoin(game.id, req.socket)
-        .lobbyLeave(req.socket)
-        .gameGuestArrived(game.id, guestInfo, req.socket)
-
       return res.json(game);
     })
   }
 
+  /**
+   * This action is called when the frontend is trying to obtain
+   * the game secret. This functionality is disabled in multiplayer
+   * games
+   */
   $.secret = function (req, res) {
     var gameId = req.param('id');
 
@@ -169,7 +205,8 @@
       }
 
       return res.json({
-        message: 'Hacker mode enabled!' + "\n" + 'The secret number is ' + game.hostSecret
+        message: 'Hacker mode enabled!' + "\n" +
+          'The secret number is ' + game.hostSecret
       })
     })
   }

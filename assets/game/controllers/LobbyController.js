@@ -9,18 +9,25 @@ angular.module('BullsAndCows').controller('LobbyController', [
     $scope.getGames = $root.lobbyGetGames;
     $scope.hasGames = $root.lobbyHasGames;
 
+    /**
+     * Models
+     */
+
+    // scope config contains the play modes
     $scope.config = {
       modes: PlayModes.all,
     }
 
+    // flags and state values for the lobby and the form
     $scope.lobby = {
       gameId: undefined,
       joinDisabled: true,
-      isCooperative: false,
+      isCooperative: true,
       errors: null,
       secret: ''
     }
 
+    // flags and state values for the "new game" form
     $scope.game = {
       playMode: undefined,
       showForm: false,
@@ -52,7 +59,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     /**
      * Sets a game error for the player mode
-     * @return {[type]} [description]
+     * @return {void}
      */
     var playModeGameError = function () {
       $scope.game.errors = {
@@ -61,8 +68,10 @@ angular.module('BullsAndCows').controller('LobbyController', [
     }
 
     /**
-     * Additional functionality when a game from the game menu is selected
-     * @param  {integer} gameId The id of the game
+     * Additional functionality when a game from the game
+     * menu is selected
+     *
+     * @param  {integer} gameId :: The id of the game
      * @return {void}
      */
     $scope.selectGame = function (gameId, isCooperative) {
@@ -76,8 +85,11 @@ angular.module('BullsAndCows').controller('LobbyController', [
     }
 
     /**
-     * @param  {integer}  gameId Selected game' id
-     * @return {Boolean}         True if the currently selected id
+     * Indicatetes if gameId matches the currently selected game.
+     * Used to set a "currently-selected" class in the view
+     *
+     * @param  {integer}  gameId :: Selected game' id
+     * @return {Boolean}
      */
     $scope.isCurrentlySelectedGame = function (gameId) {
       return gameId === $scope.lobby.gameId;
@@ -91,6 +103,14 @@ angular.module('BullsAndCows').controller('LobbyController', [
       $scope.game.showForm = !$scope.game.showForm;
     }
 
+    /**
+     * Checker for errors during game creation, also checks
+     * if a model specific error is defined - used for setting
+     * "error" class to the "new game" input fields
+     *
+     * @param  {string}  model :: Optional game.model id
+     * @return {Boolean}
+     */
     $scope.hasErrors = function (model) {
       if (undefined !== model && undefined !== $scope.game.errors[model])
         return true;
@@ -98,10 +118,21 @@ angular.module('BullsAndCows').controller('LobbyController', [
       return Object.keys($scope.game.errors).length > 0;
     }
 
+    /**
+     * Checks if there are any errors for the game join form
+     * @return {boolean}
+     */
     $scope.lobbyHasErrors = function () {
       return $scope.lobby.errors !== null;
     }
 
+    /**
+     * Inits a game creation or displays errors, if any. If
+     * game is successfully created, redirect the player to
+     * the game screen
+     *
+     * @return {void}
+     */
     $scope.startGame = function () {
       resetGameErrors();
       if (!PlayModes.isValid($scope.game.mode)) {
@@ -142,6 +173,12 @@ angular.module('BullsAndCows').controller('LobbyController', [
       )
     }
 
+    /**
+     * Toggles the startDisabled, showTitleInput and showNumber
+     * flags for the "new game" form based on the selected mode
+     *
+     * @return {void}
+     */
     $scope.selectPlayMode = function () {
       var mode = PlayModes.get($scope.game.mode);
       resetGameErrors();
@@ -151,6 +188,13 @@ angular.module('BullsAndCows').controller('LobbyController', [
       $scope.game.showNumberInput = (mode.isMultiplayer && !mode.isCooperative) ? true : false;
     }
 
+    /**
+     * Joins a player to an existing game or displays errors, if
+     * any are produced by the server. If the palyer successufuly
+     * joins the game, redirect them to the game screen
+     *
+     * @return {void}
+     */
     $scope.joinGame = function () {
       var data = {
         id: $scope.lobby.gameId,
@@ -164,7 +208,11 @@ angular.module('BullsAndCows').controller('LobbyController', [
           $scope.$apply();
         },
         function joinGameFail(errors) {
-          $scope.lobby.errors = errors.guestSecret;
+          if (errors.guessSecret) {
+            $scope.lobby.errors = errors.guestSecret;
+          } else {
+            $scope.lobby.errors = errors;
+          }
         });
     }
   }
