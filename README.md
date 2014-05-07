@@ -30,7 +30,7 @@ bower install
 Start the app using `./launch.sh` and then access it at `http://localhost:1337/`
 
 ### Credits
-Thanks to (Martin Berube)[http://www.how-to-draw-funny-cartoons.com/] for providing his royalty free vector icons, that are used for ingame.
+Thanks to [Martin Berube](http://www.how-to-draw-funny-cartoons.com/) for providing his royalty free vector icons, that are used for ingame.
 
 ### License
 MIT License
