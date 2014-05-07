@@ -1,6 +1,13 @@
 angular.module('BullsAndCows').controller('LobbyController', [
   '$scope', '$rootScope', '$location', '$timeout', 'Server', 'PlayModes',
   function ($scope, $root, $location, $timeout, Server, PlayModes) {
+    'use strict';
+
+    /**
+     * $rootScope aliases
+     */
+    $scope.getGames = $root.lobbyGetGames;
+    $scope.hasGames = $root.lobbyHasGames;
 
     $scope.config = {
       modes: PlayModes.all,
@@ -8,8 +15,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     $scope.lobby = {
       gameId: undefined,
-      joinDisabled: true,
-      leave: true
+      joinDisabled: true
     }
 
     $scope.game = {
@@ -29,9 +35,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     // on scope destroy, leave the lobby -> unsubscribe socket
     $scope.$on('$destroy', function () {
-      if (true === $scope.lobby.leave) {
-        Server.lobbyLeave();
-      }
+      Server.lobbyLeave();
     })
 
     /**
@@ -58,7 +62,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
      * @return {void}
      */
     $scope.selectGame = function (gameId) {
-      $scope.gameId = $scope.lobby.gameId === gameId ? undefined : gameId;
+      $scope.lobby.gameId = $scope.lobby.gameId === gameId ? undefined : gameId;
       $scope.lobby.joinDisabled = undefined === $scope.lobby.gameId ? true : false;
     }
 
@@ -134,12 +138,13 @@ angular.module('BullsAndCows').controller('LobbyController', [
       $scope.game.showNumberInput = (mode.isMultiplayer && !mode.isCooperative) ? true : false;
     }
 
-    $scope.hasGames = function () {
-      return Object.keys($root.lobbyGetGames()).length > 0;
-    }
-
     $scope.joinGame = function () {
-      Server.gameJoin($scope.lobby.gameId);
+      var gameId = $scope.lobby.gameId;
+      Server.gameJoin(gameId, function (response) {
+        console.log(response);
+        $location.path('/game/' + gameId);
+        $scope.$apply();
+      });
     }
   }
 ]);

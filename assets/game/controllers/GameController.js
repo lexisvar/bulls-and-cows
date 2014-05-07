@@ -1,8 +1,22 @@
-var scope
 angular.module('BullsAndCows').controller('GameController', [
   '$scope', '$rootScope', '$routeParams', 'Server', 'Game',
   function ($scope, $root, $routeParams, Server, Game) {
-    scope = $root;
+    'use strict';
+
+    /**
+     * $rootScope aliases
+     */
+    $scope.hostTurns = $root.gameGetHostTurns;
+    $scope.guestTurns = $root.gameGetGuestTurns;
+    $scope.hostName = $root.gameGetHostName;
+    $scope.guestName = $root.gameGetGuestName;
+    $scope.getWinnerName = $root.gameGetWinnerName;
+    $scope.winnerIsBot = $root.gameIsWinnerBot;
+    $scope.isOver = $root.gameIsOver;
+    $scope.getTurnsCount = $root.gameGetTurnsCount;
+    $scope.isPrematureClosed = $root.gameIsPrematureClosed;
+    $scope.isMultiplayer = $root.gameIsMultiplayer;
+
     /**
      * Check if the game data is loaded, otherwise stop execution
      * and wait for FrontController to reload the path after
@@ -47,11 +61,11 @@ angular.module('BullsAndCows').controller('GameController', [
      * @return {Boolean} [description]
      */
     $scope.isWaiting = function () {
-      if ($root.gameIsMultiplayer() || $root.gameHasGuest()) {
-        return false;
+      if ($root.gameIsMultiplayer() && !$root.gameIsOver()) {
+        return !$root.gameHasGuest();
       }
 
-      return true;
+      return false;
     }
 
     /**
@@ -145,20 +159,5 @@ angular.module('BullsAndCows').controller('GameController', [
         alert(message);
       })
     }
-
-    /**
-     * Accessor aliases for $rootScope
-     */
-    $scope.hostTurns = $root.gameGetHostTurns;
-    $scope.guestTurns = $root.gameGetGuestTurns;
-    $scope.hostName = $root.gameGetHostName;
-    $scope.guestName = $root.gameGetGuestName;
-    $scope.getWinnerName = $root.gameGetWinnerName;
-    $scope.winnerIsBot = $root.gameIsWinnerBot;
-    $scope.isOver = $root.gameIsOver;
-    $scope.getTurnsCount = $root.gameGetTurnsCount;
-    $scope.isPrematureClosed = $root.gameIsPrematureClosed;
-    $scope.isMultiplayer = $root.gameIsMultiplayer;
-
   }
 ])

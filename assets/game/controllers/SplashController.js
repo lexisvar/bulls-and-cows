@@ -1,7 +1,12 @@
 angular.module('BullsAndCows').controller('SplashController', [
-  '$scope', 'Server', '$location', '$timeout', '$rootScope',
-  function ($scope, Server, $location, $timeout, $root) {
+  '$scope', '$rootScope', '$location', '$timeout', 'Server',
+  function ($scope, $root, $location, $timeout, Server) {
     'use strict';
+
+    /**
+     * $rootScope aliases
+     */
+    $scope.getName = $root.playerGetName;
 
     /**
      * Controller state params
@@ -75,5 +80,6 @@ angular.module('BullsAndCows').controller('SplashController', [
     $scope.showError = function () {
       return $scope.state.error === null ? false : true;
     }
+
   }
 ]);

@@ -2,13 +2,15 @@ h1 Welcome to the lobby
 section.games
   table
     thead
+      td ID
       td Name
       td Created by
       td Mode
     tbody
-      tr(ng-show="!$root.lobbyHasGames()")
-        td(colspan="3") There're games at the moment
-      tr(ng-show="$root.lobbyHasGames()" ng-repeat="game in $root.lobbyGetGames()" ng-click="selectGame(game.id)" ng-class="{current: isCurrentlySelectedGame(game.id)}")
+      tr(ng-hide="hasGames()")
+        td(colspan="4") There're no games at the moment
+      tr(ng-show="hasGames()" ng-repeat="game in getGames()" ng-click="selectGame(game.id)" ng-class="{current: isCurrentlySelectedGame(game.id)}")
+        td {{game.id}}
         td {{game.title}}
         td {{game.host}}
         td(ng-switch="game.isCooperative")

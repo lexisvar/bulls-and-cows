@@ -21,10 +21,10 @@ angular.module('BullsAndCows').run([
       })
     }
 
-    $root.lobbyRemoveGame = function (game) {
+    $root.lobbyRemoveGame = function (gameId) {
       $root.apply(function () {
-        if ($root.games[game.id]) {
-          delete $root.games[game.id];
+        if ($root.games[gameId]) {
+          delete $root.games[gameId];
         }
       })
     }
@@ -40,7 +40,7 @@ angular.module('BullsAndCows').run([
     }
 
     $root.lobbyHasGames = function () {
-      return $root.games.length > 0;
+      return Object.keys($root.games).length > 0;
     }
   }
 ])

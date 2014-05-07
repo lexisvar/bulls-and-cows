@@ -10,7 +10,7 @@ div.gameOver(ng-show="isOver()")
     | The game closed prematurely, because one of the players
     | disconnected
 
-div.game(ng-show="!isWaiting()")
+div.game(ng-hide="isWaiting()")
   div.host
     h3 {{hostName()}}
     ul.turns

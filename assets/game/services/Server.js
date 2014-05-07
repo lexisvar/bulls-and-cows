@@ -54,6 +54,8 @@ angular.module('BullsAndCows').service('Server', [
     $.playerGet = function (callback) {
       $root.loadingShow();
       $socket.get('/player/get', function (response) {
+        console.debug('Player Get:', response)
+
         $root.loadingHide();
         handleResponse(response, callback);
       });
@@ -69,12 +71,15 @@ angular.module('BullsAndCows').service('Server', [
     $.playerRegister = function (data, callback, errorHandler) {
       $root.loadingShow();
       $socket.post('/player/register', data, function (response) {
+        console.debug('Player Register Data:', data);
+        console.debug('Player Register Response:', response);
+
+        var success = function () {
+          $root.playerApplyData(response, callback);
+        }
+
         $root.loadingHide();
-        handleResponse(response,
-          function onSetPlayerSuccess() {
-            $root.playerApplyData(response, callback);
-          },
-          errorHandler);
+        handleResponse(response, success, errorHandler);
       });
     }
 
@@ -91,6 +96,8 @@ angular.module('BullsAndCows').service('Server', [
     $.lobbyJoin = function (callback) {
       $root.loadingShow();
       $socket.get('/lobby/join', function (response) {
+        console.debug('Lobby Join:', response);
+
         $root.loadingHide();
         callback.call(null, response);
       })
@@ -115,6 +122,8 @@ angular.module('BullsAndCows').service('Server', [
     $.gameCreate = function (data, successCallback, errorHandler) {
       $root.loadingShow();
       $socket.get('/game/create', data, function (response) {
+        console.debug('Game Create:', response);
+
         $root.loadingHide();
         handleResponse(response, successCallback, errorHandler)
       })
@@ -129,6 +138,8 @@ angular.module('BullsAndCows').service('Server', [
     $.gameEnter = function (gameId, callback, errorCallback) {
       $root.loadingShow();
       $socket.get('/game/enter/' + gameId, function (response) {
+        console.debug('Game Enter:', response);
+
         $root.loadingHide();
 
         // if there's an error (e.g. game not found)
@@ -152,17 +163,41 @@ angular.module('BullsAndCows').service('Server', [
     $.gamePlayTurn = function (turn, successCallback, errorHandler) {
       $root.loadingShow();
       $socket.get('/game/turn', turn, function (response) {
+        console.debug('Game Play Turn:', response);
+
         $root.loadingHide();
         handleResponse(response, successCallback, errorHandler);
       })
     }
 
     $.gameSecret = function (gameId, callback) {
-      $root.loadingShow();
-      $socket.get('/game/secret', {
+      var data = {
         id: gameId
-      }, function (response) {
-        return callback.call(null, response.message);
+      }
+
+      $root.loadingShow();
+      $socket.get('/game/secret', data, function (response) {
+        console.debug('Game Secret:', response);
+
+        $root.loadingHide();
+        callback.call(null, response.message);
+      })
+    }
+
+    $.gameJoin = function (gameId, successCallback, errorHandler) {
+      var data = {
+        id: gameId
+      }
+
+      $root.loadingShow();
+      $socket.get('/game/join', data, function (response) {
+        console.debug('Game Join:', response);
+        var success = function () {
+          $.gameEnter(gameId, successCallback);
+        }
+
+        $root.loadingHide();
+        handleResponse(response, success, errorHandler)
       })
     }
 
