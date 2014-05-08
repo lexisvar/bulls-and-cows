@@ -25,7 +25,7 @@ angular.module('BullsAndCows').service('PlayModes', function () {
       isCooperative: false,
       isWithBot: true
     },
-    multiplayerCoop: {
+    multiplayer_Coop: {
       title: 'Co-op with Player vs PC',
       isMultiplayer: true,
       isCooperative: true,

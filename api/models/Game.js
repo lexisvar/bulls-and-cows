@@ -4,8 +4,8 @@ var _ = require('lodash');
   $.autoCreatedAt = false;
   $.autoUpdatedAt = false;
 
-  var invalidNumberError = "The number must be 4 digits long, " +
-    "not containg any duplicate digits and not starting with a 0";
+  var invalidNumberError = "The secret number must be 4 digits long, " +
+    "not containg any duplicate digits and not starting with a zero";
 
   var validTitleRegex = /^[a-zA-Z 0-9]{4,}$/;
 

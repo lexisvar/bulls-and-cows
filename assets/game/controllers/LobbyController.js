@@ -29,7 +29,7 @@ angular.module('BullsAndCows').controller('LobbyController', [
 
     // flags and state values for the "new game" form
     $scope.game = {
-      playMode: undefined,
+      mode: undefined,
       showForm: false,
       startDisabled: true,
       showTitleInput: false,
@@ -80,8 +80,6 @@ angular.module('BullsAndCows').controller('LobbyController', [
       $scope.lobby.gameId = sameGame ? undefined : gameId;
       $scope.lobby.joinDisabled = sameGame ? true : false;
       $scope.lobby.isCooperative = sameGame ? false : isCooperative;
-
-      console.log($scope.lobby);
     }
 
     /**
@@ -91,8 +89,33 @@ angular.module('BullsAndCows').controller('LobbyController', [
      * @param  {integer}  gameId :: Selected game' id
      * @return {Boolean}
      */
-    $scope.isCurrentlySelectedGame = function (gameId) {
+    $scope.isCurrentGame = function (gameId) {
       return gameId === $scope.lobby.gameId;
+    }
+
+    /**
+     * Indicates if the playMode matches the currently selected one.
+     * Used for mode selection menu highlighting
+     *
+     * @param  {string}  playMode :: A valid PlayModes id
+     * @return {Boolean}
+     */
+    $scope.isCurrentPlayMode = function (playMode) {
+      return playMode === $scope.game.mode;
+    }
+
+    /**
+     * Checks if the selected mode is a multiplayer one.
+     * Used for toggling the display of the "new game" form
+     *
+     * @return {Boolean} [description]
+     */
+    $scope.isMultiplayerMode = function () {
+      var mode = PlayModes.get($scope.game.mode);
+      if (!mode)
+        return false;
+
+      return mode.isMultiplayer ? true : false;
     }
 
     /**
@@ -100,6 +123,12 @@ angular.module('BullsAndCows').controller('LobbyController', [
      * @return {void}
      */
     $scope.toggleGameForm = function () {
+      var mode = PlayModes.get($scope.game.mode);
+      if (mode && mode.isMultiplayer) {
+        $scope.game.startDisabled = true;
+        return $scope.game.mode = undefined;
+      }
+
       $scope.game.showForm = !$scope.game.showForm;
     }
 

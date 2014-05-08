@@ -23,7 +23,7 @@ angular.module('BullsAndCows').controller('SplashController', [
     };
 
     // timeout to redirect to lobby after recognizing the player
-    var lobbyRedirectTimeout = 1200;
+    var lobbyRedirectTimeout = 2000;
     var lobbyWelcomeTimeout = 500;
     var welcomeStarted = false;
 

@@ -7,7 +7,7 @@
   form(ng-submit="registerPlayer()" ng-class="{error: showError()}")
     label(for="player-name") Enter name
       p.error(ng-show="showError()") {{state.error}}
-      input(id="player-name" placeholder="Name, alias, whatever..." ng-model="state.name" ng-class="{error: showError()}")
+      input(type="text" id="player-name" placeholder="Name, alias, whatever..." ng-model="state.name" ng-class="{error: showError()}")
     button(type="submit") OK
 
 // Welcome message

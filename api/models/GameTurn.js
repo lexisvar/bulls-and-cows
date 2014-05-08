@@ -4,7 +4,8 @@
   $.autoUpdatedAt = false;
 
   $.errorMessages = {
-    guess: 'Your guess is not a valid "Bulls and Cows" number'
+    guess: "The secret number must be 4 digits long, " +
+      "not containg any duplicate digits and not starting with a zero"
   }
 
   $.attributes = {
@@ -80,16 +81,12 @@
           return failCallback.call(null, game, null);
         }
 
-        console.log(!game.isMultiplayer || game.isCooperative);
-
         var secret;
         if (!game.isMultiplayer || game.isCooperative) {
           secret = game.hostSecret;
         } else {
           secret = data.isHost ? game.guestSecret : game.hostSecret;
         }
-
-        console.log(secret, game.guestSecret, game.hostSecret);
 
         var score = Engine.findMatches(data.guess, secret);
         var turnData = {

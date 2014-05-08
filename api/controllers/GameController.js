@@ -202,7 +202,6 @@
     var gameId = req.param('id');
 
     Game.findOne(gameId).then(function (game) {
-      console.log(arguments);
       if (!game || game.isMultiplayer) {
         return res.json({
           message: 'These are not the droids you are looking for!'

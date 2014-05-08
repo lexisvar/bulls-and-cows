@@ -3,9 +3,9 @@
 div.splash {
   .size(405, 450);
   position: absolute;
-  top: 50%;
   left: 50%;
-  margin: -375px 0 0 -202px;
+  top: 50%;
+  margin: -225px 0 0 -202px;
   background: url(../images/splash.png) top center no-repeat;
 
   button { 
@@ -53,12 +53,7 @@ div.splash {
     top: 50%;
     left: 50%;
     margin-left: -175px;
-    margin-top: -150px;
     text-align: center;
-    
-    &.error {
-      margin-top: -190px;
-    }
     
     label {
       font-size: 24px;
@@ -73,12 +68,6 @@ div.splash {
     }
     
     input {
-      .border-radius(10);
-      border: 0;
-      font-size: 16px;
-      line-height: 140%;
-      margin: 10px 0;
-      padding: 5px 10px;
       width: 270px;
       text-align: center;
     }
@@ -92,32 +81,25 @@ div.splash {
 
 .welcomeMessage {
   .border-radius(10px);
-  text-align: center;
-  top: 50%;
-  left: 50%;
-  
   width: 370px;
-  
+  text-align: center;
+  left: 50%;
+  top: 50%;
+  margin-top: 80px;
   margin-left: -185px;
-  margin-top: 65px;
  
   background: #4DBA2B;
   position: absolute;
   padding: 10px 0;
+  .rotate(8deg);
   
-  h1, h3 {
-    padding :0;
-    margin: 0;
+  &.animate {
+    .transition(0.4s ease-in);
+    .scale(2);
+    .opacity(0);
   }
   
   h1 { 
     font-size: 40px;
-  }
- 
-  &.animate {
-    margin-top: -150px;
-    .transition(0.4s ease-in);
-    .scale(2);
-    .opacity(0);
   }
 }

@@ -1,0 +1,245 @@
+@import "../vendor/lesshat/build/lesshat.less";
+
+.lobby {
+  .games {
+    .border-radius(10px);
+    background: #f9f9f9;
+    padding: 5px;
+    
+    width: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -250px;
+    margin-top: -240px;
+
+    h1 {
+      .border-radius(10 10 0 0);
+      .background-image(linear-gradient(to bottom, #d9e5ff 0%,#f9f9f9 100%));
+      color: #28788c;
+      text-align: center;
+      line-height: 200%;
+      font-size: 20px;
+      border: 0;
+    }
+    
+    .buttons {
+      line-height: 40px;
+      text-align: center;
+      button {
+        width: 150px;
+        font-size: 14px;
+        line-height: 180%;
+        &:last-child {
+          margin-left: 5px;
+        }
+      }
+    }
+  }
+  
+  .list {
+    border-top: 1px solid black;
+    height: 300px;
+    position: relative;
+    overflow-y: scroll;
+    margin-top: 35px;
+  }
+}
+
+table.gameTable {
+  .border-radius(0 0 8 8);
+  width: 100%;
+
+  .nogames {
+    text-align: center;
+  }
+
+  td {
+    text-align: center;
+    line-height: 28px;
+    padding: 2px;
+  }
+
+  tr {
+    border-bottom: 1px solid black;
+    td:nth-child(2) {
+      text-align: left;
+    }
+  }
+
+  thead {
+    position: fixed;
+    width: 482px;
+    margin-top: -30px;
+    td {
+      line-height: 150%;
+      font-size: 16px;
+      font-weight: bold;
+   }
+  }
+
+  thead, tbody {
+    td:nth-child(1) {
+      width: 30px;
+    }
+    td:nth-child(2) {
+      width: 45%;
+    }
+    td:nth-child(3) {
+      width: 25%;
+    }
+    td:nth-child(4) {
+      width: 25%;
+    }
+  }
+
+  tbody {
+    td {
+      font-size: 14px;
+      height: 10px;
+    }
+
+    tr {
+      cursor: pointer;
+      &:nth-child(even) {
+        background: #cfe5ea;
+      }
+      &:hover {
+        background: #fdffd3;
+      }
+      td {
+        border-bottom: 1px solid #80d1e4;
+      }
+      &:last-child {
+        td {
+          border: 0;
+        }
+      }
+      &.current {
+        background: #e8e64b;
+      }
+    }
+  }
+}
+
+.newGame {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  
+  background: rgba(0,0,0,.35);
+  
+  .dialogue {
+    .border-radius(10);
+    overflow-x: hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 380px;
+    min-height: 300px;
+    margin-top: -230px;
+    margin-left: -200px;
+    
+    padding: 10px;
+    background: #A2E3F5;
+    border: 5px solid #000;
+    
+    h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    label.mode {
+      .border-radius(8);
+      width: 370px;
+      display: block;
+      background: #dbffc9;
+      margin-bottom: 8px;
+      line-height: 220%;
+      padding: 0 0 0 10px;
+      text-align: center;
+      cursor: pointer;
+      input {
+        display: none;
+      }
+      &:hover {
+        background: #b1ff8a;
+      }
+      &.current {
+        background: #86ff4a;
+      }
+    }
+    
+    .buttons {
+      position: absolute;
+      text-align: center;
+      bottom: 10px;
+      left: 80px;
+      button {
+        font-size: 16px;
+        width: 120px;
+        &:last-child {
+          margin-left: 5px;
+        }
+      }
+    }
+  }
+  
+  .modeSelect {
+    .transition(.2s ease-out);
+    &.hidden {
+      h3 {
+        .opacity(0);
+      }
+      margin-left: -450px;
+      float: left;
+    }
+  }
+  
+  .multiplayerForm {
+    display: none;
+    width: 100%;
+    float: left;
+    position: absolute;
+    &.visible {
+      display: block;
+    }
+    
+    h3 {
+      width: 380px;
+    }
+    
+    .errors {
+      margin: 0 0 10px;
+      padding: 0 20px;
+      li {
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+    }
+    
+    .inputs {
+      position: absolute;
+      top: 110px;
+    }
+    
+    label {
+      width: 100%;
+      text-align: center;
+      display: block;
+      width: 380px;
+    }
+    
+    input {
+      text-align: center;
+      width: 300px;
+      &.secret {
+        display: block;
+        width: 155px;
+        margin-left: 100px;
+      }
+    }
+  }
+}
