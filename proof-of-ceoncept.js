@@ -1,4 +1,11 @@
 #!/usr/bin/node
+/**
+ * A proof of concept script showing the bot logic
+ * that guesses a valid random bulls and cows number
+ *
+ * The script is configured to use only 4 digit numbers
+ * that DON'T start with a zero
+ */
 
 var $ = require('./shared/GameEngine.js'),
   // Random number to be guessed
