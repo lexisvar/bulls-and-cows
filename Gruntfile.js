@@ -190,7 +190,7 @@ module.exports = function (grunt) {
         cwd: '.tmp/public/templates',
         matchBase: true,
         src: '*.html',
-        dest: '.tmp/public/js/game/templates.js',
+        dest: '.tmp/public/app/templates.js',
         options: {
           module: 'BullsAndCows',
           prefix: 'templates',
