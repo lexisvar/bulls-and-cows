@@ -1,7 +1,7 @@
 ![Splash](https://raw.githubusercontent.com/clickbuster/bulls-and-cows/master/assets/images/github-splash.png)
 
 ### About this project
-This is my humble effort to make a **Bulls and Cows game** by combining the forces of [Sails JS](http://sailsjs.org/) *(version 0.9.5)* and [Angular JS](https://angularjs.org/) *(version 1.0.8)*. The game allows the player to pick one of 5 game modes:
+This is my humble effort to make a **Bulls and Cows game** by combining the forces of [Sails JS](http://sailsjs.org/) *(version 0.9.5)* and [Angular JS](https://angularjs.org/) *(version 1.2.16)*. The game allows the player to pick one of 5 game modes:
 
 #### Single player vs the computer
 * Play solo
