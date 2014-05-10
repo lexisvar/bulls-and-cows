@@ -1,18 +1,9 @@
 (function () {
 
-  var Location = function ($location, $route, $routeParams, Player) {
+  var Location = function ($location, $routeParams, Player) {
     this.location = $location;
-    this.route = $route;
     this.params = $routeParams;
     this.player = Player;
-  }
-
-  Location.prototype.redirect = function (path) {
-    if (this.location.path() === path) {
-      return this.route.reload();
-    }
-
-    return this.location.path(path);
   }
 
   Location.prototype.getGameIdFromRequest = function () {
@@ -24,22 +15,22 @@
   }
 
   Location.prototype.goToHomepage = function () {
-    return this.redirect('/');
+    return this.location.path('/');
   }
 
   Location.prototype.goToLobby = function () {
-    return this.redirect('/lobby');
+    return this.location.path('/lobby');
   }
 
   Location.prototype.goToGame = function (gameId) {
-    return this.redirect('/game/' + gameId);
+    return this.location.path('/game/' + gameId);
   }
 
   Location.prototype.goToPlayerGame = function () {
     return this.goToGame(this.player.getGame());
   }
 
-  Location.$inject = ['$location', '$route', '$routeParams', 'Player'];
+  Location.$inject = ['$location', '$routeParams', 'Player'];
   angular.module('BullsAndCows').service('Location', Location);
 
 })()

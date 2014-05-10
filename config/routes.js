@@ -39,6 +39,16 @@ module.exports.routes = {
   '/game/enter/:id': {
     controller: 'GameController',
     action: 'enter'
+  },
+
+  '/game/end/:id': {
+    controller: 'GameController',
+    action: 'end'
+  },
+
+  '/game/secret/:id': {
+    controller: 'GameController',
+    action: 'secret'
   }
 
   /*

@@ -15,7 +15,7 @@
   }
 
   var Set = [];
-  for (var i = 1233; i < 9877; ++i) {
+  for (var i = 1022; i < 9877; ++i) {
     if ($.isValidNumber(i)) {
       Set.push(i);
     }
@@ -169,7 +169,7 @@
   }
   // if angular is defined
   else if ('object' === typeof angular) {
-    angular.module('BullsAndCows').service('Game', function () {
+    angular.module('BullsAndCows').service('Engine', function () {
       return $;
     });
   }
