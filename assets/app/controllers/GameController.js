@@ -1,9 +1,7 @@
-var c;
 (function () {
   var GameController = function ($scope, Location, GameModel, Engine, Player) {
     var gameId = Location.getGameIdFromRequest() || Player.getGame();
     var game = this;
-    c = this;
 
     this.form = {
       error: false,
