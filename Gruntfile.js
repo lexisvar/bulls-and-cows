@@ -21,13 +21,12 @@ module.exports = function (grunt) {
   var footerJS = [
     'vendor/socket.io-client/dist/socket.io.min.js',
     'vendor/lodash/dist/lodash.min.js',
-    'game/app.js',
-    'game/providers/*.js',
-    'game/*.js',
-    'game/services/*.js',
-    'game/directives/*.js',
-    'game/models/*.js',
-    'game/controllers/*.js'
+    'app/*.js',
+    'app/providers/*.js',
+    'app/services/*.js',
+    'app/directives/*.js',
+    'app/models/*.js',
+    'app/controllers/*.js'
   ];
 
   // Libraries shared between backend and frontend, injected within the footer

@@ -23,6 +23,5 @@
   }
 
   config.$inject = ['$routeProvider'];
-
   angular.module('BullsAndCows').config(config);
 })()
