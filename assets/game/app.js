@@ -1,1 +1,3 @@
-angular.module('BullsAndCows', []);
+'use strict';
+
+angular.module('BullsAndCows', ['ngRoute']);

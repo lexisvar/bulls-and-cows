@@ -123,35 +123,13 @@ table.gameTable {
 }
 
 .newGame {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  
-  background: rgba(0,0,0,.35);
-  
   .dialogue {
-    .border-radius(10);
-    overflow-x: hidden;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 380px;
+
     min-height: 300px;
     margin-top: -230px;
-    margin-left: -200px;
-    
-    padding: 10px;
-    background: #A2E3F5;
-    border: 5px solid #000;
-    
-    h3 {
-      text-align: center;
-      margin-bottom: 10px;
-    }
     
     label.mode {
+      
       .border-radius(8);
       width: 370px;
       display: block;
@@ -161,30 +139,20 @@ table.gameTable {
       padding: 0 0 0 10px;
       text-align: center;
       cursor: pointer;
-      input {
+
+      input[type="radio"] {
         display: none;
       }
+
       &:hover {
         background: #b1ff8a;
       }
+
       &.current {
         background: #86ff4a;
       }
     }
-    
-    .buttons {
-      position: absolute;
-      text-align: center;
-      bottom: 10px;
-      left: 80px;
-      button {
-        font-size: 16px;
-        width: 120px;
-        &:last-child {
-          margin-left: 5px;
-        }
-      }
-    }
+   
   }
   
   .modeSelect {
@@ -203,6 +171,7 @@ table.gameTable {
     width: 100%;
     float: left;
     position: absolute;
+
     &.visible {
       display: block;
     }
@@ -242,4 +211,20 @@ table.gameTable {
       }
     }
   }
+}
+
+.newGame, .joinGame {
+  .buttons {
+    position: absolute;
+    bottom: 10px;
+    left: 80px;
+
+    button {
+      width: 120px;
+    }
+  }
+}
+
+.joinSecret .dialogue {
+  min-height: 200px;
 }

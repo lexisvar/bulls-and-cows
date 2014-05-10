@@ -55,3 +55,43 @@ h1, h2, h3 {
   margin: 0;
   text-transform: capitalize;
 }
+
+.cover {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  
+  background: rgba(0,0,0,.35);
+}
+
+.dialogue {
+  .border-radius(10);
+  overflow-x: hidden;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+
+  margin-left: -200px;
+  padding: 10px;
+  background: #A2E3F5;
+  border: 5px solid #000;
+  
+  h3 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+}
+
+.buttons {
+  text-align: center;
+  
+  button {
+    font-size: 16px;
+    &:last-child {
+      margin-left: 5px;
+    }
+  }
+}

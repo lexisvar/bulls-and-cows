@@ -3,7 +3,7 @@
  * Sails backend, extracted from the default Sails
  * bundle and converted into an Angular module
  */
-angular.module('BullsAndCows', [])
+angular.module('BullsAndCows')
   .provider('$socket', function () {
     var io = window.io,
       socketClass = io.SocketNamespace,

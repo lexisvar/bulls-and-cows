@@ -18,8 +18,10 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "angular": "~1.0.8",
+    "angular": "~1.2.16",
     "socket.io-client": "~0.9.16",
-    "lesshat": "~3.0.0"
+    "lesshat": "~3.0.0",
+    "lodash": "~2.4.1",
+    "angular-route": "~1.2.16"
   }
 }

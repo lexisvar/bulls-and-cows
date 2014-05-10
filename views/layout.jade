@@ -1,17 +1,17 @@
 doctype html
 html
   head
-  title Bulls and Cows
-  - /* includes JavaScripts loaded in the header of the page */
-  include _meta/topScripts
-  - /* includes CSS Styles */
-  include _meta/styles
-  block styles
+    title Bulls and Cows
+    - /* includes JavaScripts loaded in the header of the page */
+    include _meta/topScripts
+    - /* includes CSS Styles */
+    include _meta/styles
+    block styles
   body(ng-app="BullsAndCows" ng-controller="FrontController")
-    section(ng-view ng-show="$root.appIsLoaded()")
+    section(ng-view ng-show="app.init")
       block body
       block footer
-    section.loading(ng-show="$root.loadingIsVisible()")
+    section.loading(ng-show="loading.isVisible")
       | Loading screen
     - /* includes JavaScripts loaded in the footer of the page */
     include _meta/bottomScripts

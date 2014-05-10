@@ -14,23 +14,20 @@ module.exports = function (grunt) {
   // JS to be injected into the header
   var headerJS = [
     'vendor/angular/angular.js',
-    'vendor/socket.io-client/dist/socket.io.min.js'
+    'vendor/angular-route/angular-route.min.js',
   ];
 
   // JS to be injected into the footer
   var footerJS = [
+    'vendor/socket.io-client/dist/socket.io.min.js',
+    'vendor/lodash/dist/lodash.min.js',
     'game/app.js',
     'game/providers/*.js',
-    'game/templates.js',
-    'game/config.js',
-    'game/routes.js',
-    'game/rootScope/Main.js',
-    'game/rootScope/*.js',
-    'game/directives/*.js',
-    'game/factories/*.js',
+    'game/*.js',
     'game/services/*.js',
-    'game/controllers/*.js',
-    'game/*.js'
+    'game/directives/*.js',
+    'game/models/*.js',
+    'game/controllers/*.js'
   ];
 
   // Libraries shared between backend and frontend, injected within the footer

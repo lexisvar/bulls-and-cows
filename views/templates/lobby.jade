@@ -1,3 +1,4 @@
+// GAMES LOBBY
 section.lobby
   div.games
     h1 Welcome to the lobby
@@ -9,44 +10,74 @@ section.lobby
           td Created by
           td Mode
         tbody
-          tr(ng-hide="hasGames()")
-            td(colspan="4" class="nogames") There're no games at the moment
-          tr(ng-show="hasGames()" ng-repeat="game in getGames()" ng-click="selectGame(game.id, game.isCooperative)" ng-class="{current: isCurrentGame(game.id)}")
+          tr(ng-hide="lobby.session.total > 0")
+            td(colspan="4" class="nogames") 
+              | There're no games at the moment
+          tr(ng-show="lobby.session.total > 0" 
+            ng-repeat="game in lobby.session.games"
+            ng-click="lobby.selectGame(game.id)"
+            ng-class="{current: game.id === lobby.join.selected}")
             td {{game.id}}
             td {{game.title}}
             td {{game.host}}
             td(ng-switch="game.isCooperative")
               span(ng-switch-when="true") Cooperative
               span(ng-switch-default) Player vs Player
-    .secret(ng-show="!lobby.isCooperative")
-      div(ng-show="lobbyHasErrors()") {{lobby.errors}}
-      input(ng-model="game.secret" ng-class="{error: lobbyHasErrors()}")
     .buttons
-      button(ng-click="toggleGameForm()") Create New Game
-      button(ng-click="joinGame()" ng-disabled="lobby.joinDisabled") Join Game
+      button(ng-click="lobby.create.form = true") Create New Game
+      button(ng-click="joinGame()" 
+        ng-enabled="lobby.join.selected !== false") Join Game
 
-.newGame(ng-show="game.showForm")
+// JOIN GAME FORM
+.joinGame.cover(ng-show="lobby.join.form")
   .dialogue
-    // play modes
-    div.modeSelect(ng-class="{hidden: isMultiplayerMode()}")
-      h3(ng-class="{error: hasErrors('mode')}") Choose game mode
-      label.mode(ng-repeat="(modeId, mode) in config.modes" ng-class="{current: isCurrentPlayMode(modeId)}") {{mode.title}}
-        input(type="radio" ng-model="game.mode" ng-value="modeId" ng-click="selectPlayMode()")
+    h3 Enter Secret
+    div(ng-show="lobby.join.error") {{lobby.error}}
+    input(type="text"
+      ng-model="lobby.join.secret"
+      ng-class="{error: lobby.join.error}")
+    .buttons
+      button(ng-click="lobby.joinGame()") Continue
+      button(ng-click="lobby.joinCancel()") Cancel
 
-    div.multiplayerForm(ng-class="{visible: isMultiplayerMode()}")
+// NEW GAME FORM
+.newGame.cover(ng-show="lobby.create.form")
+  .dialogue
+    // PLAY MODE SELECTION
+    div.modeSelect(
+      ng-class="{hidden: lobby.play.modes[lobby.create.mode].isMultiplayer}")
+      h3 Choose game mode
+      label.mode(ng-repeat="(modeId, mode) in lobby.play.modes" 
+        ng-class="{current: lobby.create.mode === modeId}")
+        | {{mode.title}}
+        input(type="radio"
+          ng-model="game.mode"
+          ng-value="modeId"
+          ng-click="lobby.create.mode = modeId")
+
+    // MULTIPLAYER FORM 
+    div.multiplayerForm(
+      ng-class="{visible: lobby.play.modes[lobby.create.mode].isMultiplayer}")
       h3 Multiplayer Game
 
       // error messages
-      ul.errors(ng-show="hasErrors()")
-        li(ng-repeat="error in game.errors") {{error}}
+      ul.errors(ng-show="lobby.create.errors !== {}")
+        li(ng-repeat="error in lobby.create.errors") {{error}}
 
       .inputs
-        label(ng-show="game.showTitleInput") Enter Game Title
-          input(type="text" ng-model="game.title" ng-class="{error: hasErrors('title')}")
+        label Enter Game Title
+          input(type="text"
+            ng-model="lobby.create.title"
+            ng-class="{error: lobby.create.errors['title']}")
 
-        label(ng-show="game.showNumberInput") Enter Secret Number
-          input.secret(type="text" ng-model="game.secret" ng-class="{error: hasErrors('hostSecret')}")
+        label(
+          ng-show="!lobby.play.modes[lobby.create.mode].isCooperative")
+            | Enter Secret Number
+          input.secret(type="text"
+            ng-model="lobby.create.secret"
+            ng-class="{error: lobby.create.errors['hostSecret']}")
 
     .buttons
-      button(ng-click="startGame()" ng-disabled="game.startDisabled") Start Game
-      button(ng-click="toggleGameForm()") Cancel
+      button(ng-click="lobby.createGame()"
+        ng-disabled="lobby.create.mode === false") Start Game
+      button(ng-click="lobby.createCancel()") Cancel
