@@ -162,22 +162,16 @@
   /**
    * Attach model, based on environment
    */
-
-  // if exports is defined
-  if ('object' === typeof exports) {
-    return $;
-  }
   // if angular is defined
-  else if ('object' === typeof angular) {
+  if ('object' === typeof angular) {
     angular.module('BullsAndCows').service('Engine', function () {
       return $;
     });
-  }
-  // otherwise register to window
-  else {
-    window['BullsAndCows_Game'] = $;
+  } else if ('object' === typeof window) {
+    window['BullsAndCows_Engine'] = $;
   }
 
+  return $;
 })((function () {
   if ('undefined' === typeof module || 'undefined' === typeof module.exports)
     return {}
