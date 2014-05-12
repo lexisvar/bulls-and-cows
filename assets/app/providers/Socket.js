@@ -7,7 +7,7 @@ angular.module('BullsAndCows')
   .provider('$socket', function () {
     var io = window.io,
       socketClass = io.SocketNamespace,
-      socket = window.socket = io.connect();
+      socket = io.connect();
 
     this.$get = function () {
       return {
@@ -17,6 +17,11 @@ angular.module('BullsAndCows')
         put: socket.put,
         'delete': socket['delete'],
         request: socket.request,
+        on: function (event, callback, context) {
+          return socket.on(event, function (result) {
+            callback.call(context, result);
+          })
+        },
         io: window.io
       }
     }
@@ -30,8 +35,8 @@ angular.module('BullsAndCows')
      * @param {Object1} params ::    parameters to send with the request [optional]
      * @param {Function} cb    ::    callback function to call when finished [optional]
      */
-    socketClass.prototype.get = function (url, data, cb) {
-      return this.request(url, data, cb, 'get');
+    socketClass.prototype.get = function (url, data, cb, context) {
+      return this.request(url, data, cb, 'get', context);
     };
 
     /**
@@ -43,8 +48,8 @@ angular.module('BullsAndCows')
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype.post = function (url, data, cb) {
-      return this.request(url, data, cb, 'post');
+    socketClass.prototype.post = function (url, data, cb, context) {
+      return this.request(url, data, cb, 'post', context);
     };
 
     /**
@@ -56,8 +61,8 @@ angular.module('BullsAndCows')
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype.put = function (url, data, cb) {
-      return this.request(url, data, cb, 'put');
+    socketClass.prototype.put = function (url, data, cb, context) {
+      return this.request(url, data, cb, 'put', context);
     };
 
     /**
@@ -69,15 +74,15 @@ angular.module('BullsAndCows')
      * @param {Object} params ::    parameters to send with the request [optional]
      * @param {Function} cb   ::    callback function to call when finished [optional]
      */
-    socketClass.prototype['delete'] = function (url, data, cb) {
-      return this.request(url, data, cb, 'delete');
+    socketClass.prototype['delete'] = function (url, data, cb, context) {
+      return this.request(url, data, cb, 'delete', context);
     };
 
     /**
      * Simulate HTTP over Socket.io
      * @api private :: but exposed for backwards compatibility w/ <= sails@~0.8
      */
-    socketClass.prototype.request = function (url, data, cb, method) {
+    socketClass.prototype.request = function (url, data, cb, method, context) {
       var usage = 'Usage:\n socket.' +
         (method || 'request') +
         '( destinationURL, dataToSend, fnToCallWhenComplete )';
@@ -94,6 +99,7 @@ angular.module('BullsAndCows')
 
       // Allow data arg to be optional
       if (typeof data === 'function') {
+        context = cb;
         cb = data;
         data = {};
       }
@@ -122,7 +128,7 @@ angular.module('BullsAndCows')
         if (parsedResult === 403) throw new Error("403: Forbidden");
         if (parsedResult === 500) throw new Error("500: Server error");
 
-        cb && cb(parsedResult);
+        cb && cb.call(context, parsedResult);
       });
     }
   });
