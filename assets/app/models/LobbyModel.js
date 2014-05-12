@@ -44,13 +44,13 @@
 
   LobbyModel.prototype.addGame = function (game) {
     this.games[game.id] = game;
-    lobby.total++;
+    this.total++;
   }
 
   LobbyModel.prototype.removeGame = function (gameId) {
     if (undefined !== this.games[gameId]) {
       delete this.games[gameId];
-      lobby.total--;
+      this.total--;
     }
   }
 

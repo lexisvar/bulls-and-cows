@@ -114,7 +114,8 @@
       alert(errors.hasGame);
       this.location.goToPlayerGame();
     } else {
-      this.join.error = _.first(errors);
+      for (var x in errors) break;
+      this.join.error = errors[x];
     }
 
     this.scope.$apply();

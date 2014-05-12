@@ -172,4 +172,4 @@
   }
 
   return $;
-})((module && module.exports) ? module.exports : {})
+})(('undefined' !== typeof module && module.exports) ? module.exports : {})

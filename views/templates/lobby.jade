@@ -31,9 +31,10 @@ section.lobby
 // JOIN GAME FORM
 .joinGame.cover(ng-show="lobby.join.form")
   .dialogue
-    h3 Enter Secret
-    div(ng-show="lobby.join.error") {{lobby.error}}
+    h3 What is your secret number?
+    div(ng-show="lobby.join.error") {{lobby.join.error}}
     input(type="text"
+      placeholder="enter secret"
       ng-model="lobby.join.secret"
       ng-class="{error: lobby.join.error}")
     .buttons

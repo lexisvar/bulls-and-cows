@@ -13,12 +13,12 @@ module.exports = function (grunt) {
 
   // JS to be injected into the header
   var headerJS = [
-    'vendor/angular/angular.js',
-    'vendor/angular-route/angular-route.min.js',
+    'vendor/angular/angular.js'
   ];
 
   // JS to be injected into the footer
   var footerJS = [
+    'vendor/angular-route/angular-route.min.js',
     'vendor/socket.io-client/dist/socket.io.min.js',
     'vendor/lodash/dist/lodash.min.js',
     'app/*.js',
@@ -112,8 +112,7 @@ module.exports = function (grunt) {
     less: {
       dev: {
         options: {
-          sourceMap: true,
-          sourceMapURL: '/css/'
+          sourceMap: true
         },
         files: [{
           expand: true,
@@ -222,7 +221,7 @@ module.exports = function (grunt) {
         options: {
           startTag: '// TOP SCRIPTS',
           endTag: '// TOP SCRIPTS END',
-          fileTmpl: 'script(type="text/javascript", src="%s")',
+          fileTmpl: 'script(type="text/javascript" src="%s")',
           appRoot: '.tmp/public'
         },
         files: {
@@ -234,7 +233,7 @@ module.exports = function (grunt) {
         options: {
           startTag: '// SCRIPTS',
           endTag: '// SCRIPTS END',
-          fileTmpl: 'script(type="text/javascript", src="%s")',
+          fileTmpl: 'script(type="text/javascript" src="%s")',
           appRoot: '.tmp/public'
         },
         files: {
@@ -246,7 +245,7 @@ module.exports = function (grunt) {
         options: {
           startTag: '// SCRIPTS',
           endTag: '// SCRIPTS END',
-          fileTmpl: 'script(type="text/javascript", src="%s")',
+          fileTmpl: 'script(type="text/javascript" src="%s")',
           appRoot: '.tmp/public'
         },
         files: {
@@ -258,7 +257,7 @@ module.exports = function (grunt) {
         options: {
           startTag: '// STYLES',
           endTag: '// STYLES END',
-          fileTmpl: 'link(rel="stylesheet", href="%s")',
+          fileTmpl: 'link(rel="stylesheet" type="text/css" href="%s")',
           appRoot: '.tmp/public'
         },
         files: {
@@ -270,7 +269,7 @@ module.exports = function (grunt) {
         options: {
           startTag: '// STYLES',
           endTag: '// STYLES END',
-          fileTmpl: 'link(rel="stylesheet", href="%s")',
+          fileTmpl: 'link(rel="stylesheet" type="text/css" href="%s")',
           appRoot: '.tmp/public'
         },
         files: {
