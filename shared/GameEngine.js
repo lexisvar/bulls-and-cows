@@ -172,9 +172,4 @@
   }
 
   return $;
-})((function () {
-  if ('undefined' === typeof module || 'undefined' === typeof module.exports)
-    return {}
-
-  return module.exports
-})());
+})((module && module.exports) ? module.exports : {})
