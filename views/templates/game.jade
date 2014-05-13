@@ -1,55 +1,61 @@
-div.waiting(ng-show="game.session.isWaiting()")
-  | Waiting for a player to join the game
-div.gameOver(ng-show="game.session.data.isOver")
-  h2 Game Over!
-  div.normal(ng-show="!game.session.data.isPrematureClosed")
-    div.name The winner is {{game.session.getWinnerName()}}
-      span.bot(ng-show="game.session.winnerIsBot") &nbsp;(Bot)
-    div.count Found the secret number in {{game.session.turns}} turns!
-  div.premature(ng-show="game.session.data.isPrematureClosed")
-    | The game closed prematurely, because one of the players
-    | disconnected
+div.game
+  div.waiting(ng-show="game.session.isWaiting()")
+    | Waiting for a player to join the game
+  div.gameOver(ng-show="game.session.data.isOver")
+    h2 Game Over!
+    div.normal(ng-show="!game.session.data.isPrematureClosed")
+      div.name The winner is {{game.session.getWinnerName()}}
+        span.bot(ng-show="game.session.winnerIsBot") &nbsp;(Bot)
+      div.count Found the secret number in {{game.session.turns}} turns!
+    div.premature(ng-show="game.session.data.isPrematureClosed")
+      | The game closed prematurely, because one of the players
+      | disconnected
 
-div.game(ng-hide="game.session.isWaiting()")
-  div.host
-    h3 {{game.session.data.host}}
-    ul.turns
-      li(ng-repeat="turn in game.session.hostTurns")
-        div(bc-icon cows="turn.cows" bulls="turn.bulls")
-        | {{turn.guess}}
-        span(ng-switch="turn.cows") &nbsp;{{turn.cows}}&nbsp;
-          span(ng-switch-when="1") cow
-          span(ng-switch-default) cows
-        span(ng-switch="turn.bulls") &nbsp;{{turn.bulls}}&nbsp;
-          span(ng-switch-when="1") bull
-          span(ng-switch-default) bulls
+  div.board(ng-hide="game.session.isWaiting()")
+    div.host
+      h3 {{game.session.data.host}}
+      ul.turns
+        li(
+          ng-repeat="turn in game.session.hostTurns" 
+          ng-class="{winning: turn.bulls == 4}"
+          class="b{{turn.bulls}}c{{turn.cows}}")
+          .number {{turn.guess}}
+          div(bc-icon cows="turn.cows" bulls="turn.bulls")
+          span(ng-switch="turn.cows") &nbsp;{{turn.cows}}&nbsp;
+            span(ng-switch-when="1") cow
+            span(ng-switch-default) cows
+          span(ng-switch="turn.bulls") &nbsp;{{turn.bulls}}&nbsp;
+            span(ng-switch-when="1") bull
+            span(ng-switch-default) bulls
+    duv.vs Vs.
+    div.guest
+      h3 {{game.session.data.guest}}
+      ul.turns
+        li(ng-repeat="turn in game.session.guestTurns" 
+          ng-class="{winning: turn.bulls == 4}"
+          class="b{{turn.bulls}}c{{turn.cows}}")
+          .number {{turn.guess}}
+          div(bc-icon cows="turn.cows" bulls="turn.bulls")
+          span(ng-switch="turn.cows") &nbsp;{{turn.cows}}&nbsp;
+            span(ng-switch-when="1") cow
+            span(ng-switch-default) cows
+          span(ng-switch="turn.bulls") &nbsp;{{turn.bulls}}&nbsp;
+            span(ng-switch-when="1") bull
+            span(ng-switch-default) bulls
 
-  div.guest
-    h3 {{game.session.data.guest}}
-    ul.turns
-      li(ng-repeat="turn in game.session.guestTurns")
-        div(bc-icon cows="turn.cows" bulls="turn.bulls")
-        | {{turn.guess}}
-        span(ng-switch="turn.cows") &nbsp;{{turn.cows}}&nbsp;
-          span(ng-switch-when="1") cow
-          span(ng-switch-default) cows
-        span(ng-switch="turn.bulls") &nbsp;{{turn.bulls}}&nbsp;
-          span(ng-switch-when="1") bull
-          span(ng-switch-default) bulls
-
-  form.guess(ng-class="{host: game.player.isHost()}" 
-    ng-submit="game.playTurn()" 
-    ng-show="!game.session.data.isOver")
-    div(ng-show="game.form.error" class="error") {{data.error}}
-    div(ng-show="game.session.isPlayerTurn()")
-      input(type="text" 
-        ng-model="game.form.guess" 
-        ng-show="!game.session.isBotTurn()")
-      button(type="submit" 
-        ng-disabled="!game.session.isPlayerTurn()" 
-        ng-switch="game.session.isBotTurn()") 
-        span(ng-switch-when="true") Guess with Bot!
-        span(ng-switch-default) Guess!
-        button(type="button" 
-          ng-show="!game.session.data.isMultiplayer"
-          ng-click="game.getSecret()") Show Secret
+    form.guess(ng-class="{host: game.player.isHost()}" 
+      ng-submit="game.playTurn()" 
+      ng-show="!game.session.data.isOver")
+      div(ng-show="game.form.error" class="error") {{data.error}}
+      div(ng-show="game.session.isPlayerTurn()")
+        input(type="text" 
+          ng-model="game.form.guess" 
+          ng-show="!game.session.isBotTurn()")
+        button(type="submit" 
+          ng-disabled="!game.session.isPlayerTurn()" 
+          ng-switch="game.session.isBotTurn()") 
+          span(ng-switch-when="true") Guess with Bot!
+          span(ng-switch-default) Guess!
+          button(type="button" 
+            ng-show="!game.session.data.isMultiplayer"
+            ng-click="game.getSecret()") Show Secret

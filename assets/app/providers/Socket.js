@@ -105,7 +105,7 @@ angular.module('BullsAndCows')
       // Send the message over the socket
       this.emit(method, json, function afterEmitted(result) {
         var parsedResult = result;
-        console.log('result', result);
+
         try {
           parsedResult = window.io.JSON.parse(result);
         } catch (e) {
