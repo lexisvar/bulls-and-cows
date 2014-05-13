@@ -12,7 +12,7 @@ div.gameOver(ng-show="game.session.data.isOver")
 
 div.game(ng-hide="game.session.isWaiting()")
   div.host
-    h3 {{hostName()}}
+    h3 {{game.session.data.host}}
     ul.turns
       li(ng-repeat="turn in game.session.hostTurns")
         div(bc-icon cows="turn.cows" bulls="turn.bulls")
@@ -25,7 +25,7 @@ div.game(ng-hide="game.session.isWaiting()")
           span(ng-switch-default) bulls
 
   div.guest
-    h3 {{guestName()}}
+    h3 {{game.session.data.guest}}
     ul.turns
       li(ng-repeat="turn in game.session.guestTurns")
         div(bc-icon cows="turn.cows" bulls="turn.bulls")

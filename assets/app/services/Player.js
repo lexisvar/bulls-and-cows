@@ -4,8 +4,8 @@
 
   var Player = function ($socket, Loading) {
     this.data = {};
-    this.loading = Loading;
     this.socket = $socket;
+    this.loading = Loading;
   }
 
   Player.$inject = ['$socket', 'Loading'];
@@ -14,35 +14,32 @@
     this.data = data || {};
   }
 
-  Player.prototype.register = function (name, success, fail) {
-    var player = this,
-      data = {
-        name: name
-      };
+  Player.prototype.register = function (name, success, fail, context) {
+    var data = {
+      name: name
+    };
 
     this.loading.show();
     this.socket.post('/player/register', data, function (response) {
       console.debug('[PLAYER REGISTER]: ', response);
 
-      player.loading.hide();
+      this.loading.hide();
       if (response.errors && response.errors.name) {
-        return fail.call(null, response.errors.name);
+        return fail.call(context, response.errors.name);
       }
 
-      player.set(response);
-      success.call(null, response);
-    })
+      this.set(response);
+      success.call(context, response);
+    }, this);
   }
 
-  Player.prototype.getIdentity = function (callback) {
-    var player = this;
-
+  Player.prototype.getIdentity = function (callback, context) {
     this.loading.show();
     this.socket.get('/player/get', function (response) {
-      player.loading.hide();
-      player.set(response);
-      callback.call(null, response);
-    })
+      this.loading.hide();
+      this.set(response);
+      callback.call(context, response);
+    }, this);
   }
 
   Player.prototype.getName = function () {

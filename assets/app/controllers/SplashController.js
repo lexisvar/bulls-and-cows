@@ -49,23 +49,17 @@
 
   Splash.prototype.register = function () {
     this.form.error = false;
-
-    var splash = this;
-    var success = function () {
-      splash.displayWelcome.call(splash);
-      splash.scope.$apply();
-    }
-
-    var fail = function (error) {
-      splash.registerError.call(splash, error);
-      splash.scope.$apply();
-    }
-
-    this.player.register(this.form.name, success, fail);
+    this.player.register(this.form.name, this.registerSuccess, this.registerFail, this);
   }
 
-  Splash.prototype.registerError = function (error) {
+  Splash.prototype.registerSuccess = function () {
+    this.displayWelcome();
+    this.scope.$apply();
+  }
+
+  Splash.prototype.registerFail = function (error) {
     this.form.error = error;
+    this.scope.$apply();
   }
 
   angular.module('BullsAndCows').controller('SplashController', Splash);

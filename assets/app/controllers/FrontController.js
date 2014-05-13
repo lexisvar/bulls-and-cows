@@ -2,19 +2,18 @@
   var Front = function ($scope, Player, Location, Loading) {
     this.player = Player;
     this.location = Location;
+    this.scope = $scope;
 
-    $scope.loading = Loading;
-    $scope.app = {
+    this.scope.loading = Loading;
+    this.scope.app = {
       init: false
     }
 
-    var FC = this;
     this.player.getIdentity(function (response) {
-      $scope.$apply(function () {
-        FC.handleIdentity.call(FC, response);
-        $scope.app.init = true;
-      })
-    });
+      this.handleIdentity(response);
+      this.scope.app.init = true;
+      this.scope.$apply();
+    }, this);
   }
 
   Front.$inject = ['$scope', 'Player', 'Location', 'Loading'];

@@ -66,19 +66,22 @@ section.lobby
         li(ng-repeat="error in lobby.create.errors") {{error}}
 
       .inputs
-        label Enter Game Title
+        label Pick a Game Title
           input(type="text"
+            placeholder="game title..."
             ng-model="lobby.create.title"
             ng-class="{error: lobby.create.errors['title']}")
 
         label(
           ng-show="!lobby.play.modes[lobby.create.mode].isCooperative")
-            | Enter Secret Number
+            | Enter a Secret Number
           input.secret(type="text"
+            placeholder="enter secret"
             ng-model="lobby.create.secret"
             ng-class="{error: lobby.create.errors['hostSecret']}")
 
     .buttons
-      button(ng-click="lobby.createGame()"
+      button(type="submit"
+        ng-click="lobby.createGame()"
         ng-disabled="lobby.create.mode === false") Start Game
       button(ng-click="lobby.createCancel()") Cancel

@@ -5,41 +5,41 @@
   var _socket, _loading;
 
   var LobbyModel = function ($scope) {
-    this.io = _socket;
+    this.socket = _socket;
     this.loading = _loading;
 
     this.scope = $scope;
     this.games = {};
     this.total = 0;
 
-    var lobby = this;
-
     this.loading.show();
-    this.io.get('/lobby/join', function (response) {
-      console.debug('[SERVER] Lobby Join:', response);
-      lobby.loading.hide();
+    this.socket.get('/lobby/join', this.loadData, this);
 
-      _.each(response, function (game) {
-        lobby.games[game.id] = game;
-      })
-
-      lobby.total = Object.keys(lobby.games).length;
-      $scope.$apply();
-    })
-
-    this.io.socket.on('newGame', function (game) {
+    this.socket.on('newGame', function (game) {
       console.debug('[SOCKET] New game:', game);
-      lobby.addGame.call(lobby, game);
-      $scope.$apply();
-    })
+      this.addGame(game);
+      this.scope.$apply();
+    }, this);
 
-    this.io.socket.on('removeGame', function (id) {
+    this.socket.on('removeGame', function (id) {
       console.debug('[SOCKET] Remove game:', id);
-      lobby.removeGame.call(lobby, id);
-      $scope.$apply();
-    });
+      this.removeGame(id);
+      this.scope.$apply();
+    }, this);
 
     return this;
+  }
+
+  LobbyModel.prototype.loadData = function (response) {
+    console.debug('[SERVER] Lobby Join:', response);
+    this.loading.hide();
+
+    _.each(response, function (game) {
+      this.games[game.id] = game;
+    }, this)
+
+    this.total = Object.keys(this.games).length;
+    this.scope.$apply();
   }
 
   LobbyModel.prototype.addGame = function (game) {
@@ -55,45 +55,41 @@
   }
 
   LobbyModel.prototype.destroy = function (callback) {
-    this.io.socket.removeAllListeners('newGame');
-    this.io.socket.removeAllListeners('removeGame');
-    this.io.get('/lobby/leave', function (response) {
+    this.socket.off('newGame');
+    this.socket.off('removeGame');
+    this.socket.get('/lobby/leave', function (response) {
       callback.call(null, response);
     });
   }
 
   LobbyModel.prototype.create = function (data, success, fail, context) {
-    var lobby = this;
-
     this.loading.show();
-    this.io.post('/game/create', data, function (response) {
+    this.socket.post('/game/create', data, function (response) {
       console.debug('[SERVER] Game Create:', response);
 
-      lobby.loading.hide();
+      this.loading.hide();
       if (response.errors) {
         fail.call(context, response.errors);
       } else {
         success.call(context, response);
       }
-      lobby.scope.$apply();
-    })
+      this.scope.$apply();
+    }, this)
   }
 
   LobbyModel.prototype.join = function (data, success, fail, context) {
-    var lobby = this;
     this.loading.show();
-
-    this.io.post('/game/join', data, function (response) {
+    this.socket.post('/game/join', data, function (response) {
       console.debug('[SERVER] Game Join:', response);
 
-      lobby.loading.hide();
+      this.loading.hide();
       if (response.errors) {
         fail.call(context, response.errors);
       } else {
         success.call(context, response);
       }
-      lobby.scope.$apply();
-    })
+      this.scope.$apply();
+    }, this);
   }
 
   LobbyModel.$factory = function ($socket, Loading) {

@@ -187,7 +187,12 @@
         });
       }
 
+      // update user session
       Session.setGame(req, game);
+
+      // announce game joined
+      SocketService.gameGuestArrived(game.id, guestInfo, req.socket);
+
       Game.secure(game);
       return res.json(game);
     })

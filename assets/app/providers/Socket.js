@@ -5,84 +5,76 @@
  */
 angular.module('BullsAndCows')
   .provider('$socket', function () {
-    var io = window.io,
-      socketClass = io.SocketNamespace,
-      socket = io.connect();
-
     this.$get = function () {
-      return {
-        socket: socket,
-        get: socket.get,
-        post: socket.post,
-        put: socket.put,
-        'delete': socket['delete'],
-        request: socket.request,
-        on: function (event, callback, context) {
-          return socket.on(event, function (result) {
-            callback.call(context, result);
-          })
-        },
-        io: window.io
-      }
+      return new SocketProvider();
+    }
+
+    var SocketProvider = function () {
+      this.io = window.io;
+      this.socket = this.io.connect();
+      return this;
+    }
+
+
+    /**
+     * Register event handler
+     */
+    SocketProvider.prototype.on = function (eventName, callback, context) {
+      return this.socket.on(eventName, function (result) {
+        return callback.call(context || null, result);
+      })
     }
 
     /**
-     * Simulate a GET request to sails
-     * e.g.
-     *    `socket.get('/user/3', Stats.populate)`
-     *
-     * @param {String} url     ::    destination URL
-     * @param {Object1} params ::    parameters to send with the request [optional]
-     * @param {Function} cb    ::    callback function to call when finished [optional]
+     * Unregister event handler
      */
-    socketClass.prototype.get = function (url, data, cb, context) {
-      return this.request(url, data, cb, 'get', context);
+    SocketProvider.prototype.off = function (eventName) {
+      return this.socket.removeAllListeners(eventName);
+    }
+
+    /**
+     * Extension of the Socket.io emit method that uses
+     * callback context
+     */
+    SocketProvider.prototype.emit = function (eventName, data, callback, context) {
+      return this.socket.emit(eventName, data, function (result) {
+        return callback.call(context || null, result);
+      })
+    }
+
+    /**
+     * Simulate a GET request
+     */
+    SocketProvider.prototype.get = function (url, data, callback, context) {
+      return this.request(url, data, callback, 'get', context);
     };
 
     /**
-     * Simulate a POST request to sails
-     * e.g.
-     *    `socket.post('/event', newMeeting, $spinner.hide)`
-     *
-     * @param {String} url    ::    destination URL
-     * @param {Object} params ::    parameters to send with the request [optional]
-     * @param {Function} cb   ::    callback function to call when finished [optional]
+     * Simulate a POST request
      */
-    socketClass.prototype.post = function (url, data, cb, context) {
-      return this.request(url, data, cb, 'post', context);
+    SocketProvider.prototype.post = function (url, data, callback, context) {
+      return this.request(url, data, callback, 'post', context);
     };
 
     /**
-     * Simulate a PUT request to sails
-     * e.g.
-     *    `socket.post('/event/3', changedFields, $spinner.hide)`
-     *
-     * @param {String} url    ::    destination URL
-     * @param {Object} params ::    parameters to send with the request [optional]
-     * @param {Function} cb   ::    callback function to call when finished [optional]
+     * Simulate a PUT request
      */
-    socketClass.prototype.put = function (url, data, cb, context) {
-      return this.request(url, data, cb, 'put', context);
+    SocketProvider.prototype.put = function (url, data, callback, context) {
+      return this.request(url, data, callback, 'put', context);
     };
 
     /**
-     * Simulate a DELETE request to sails
-     * e.g.
-     *    `socket.delete('/event', $spinner.hide)`
-     *
-     * @param {String} url    ::    destination URL
-     * @param {Object} params ::    parameters to send with the request [optional]
-     * @param {Function} cb   ::    callback function to call when finished [optional]
+     * Simulate a DELETE request
      */
-    socketClass.prototype['delete'] = function (url, data, cb, context) {
-      return this.request(url, data, cb, 'delete', context);
+    SocketProvider.prototype.delete = function (url, data, callback, context) {
+      return this.request(url, data, callback, 'delete', context);
     };
 
     /**
      * Simulate HTTP over Socket.io
-     * @api private :: but exposed for backwards compatibility w/ <= sails@~0.8
+     * @api private :: but exposed for backwards compatibility
      */
-    socketClass.prototype.request = function (url, data, cb, method, context) {
+    SocketProvider.prototype.request = function (url, data, callback, method, context) {
       var usage = 'Usage:\n socket.' +
         (method || 'request') +
         '( destinationURL, dataToSend, fnToCallWhenComplete )';
@@ -99,21 +91,21 @@ angular.module('BullsAndCows')
 
       // Allow data arg to be optional
       if (typeof data === 'function') {
-        context = cb;
-        cb = data;
+        context = callback;
+        callback = data;
         data = {};
       }
 
       // Build to request
-      var json = window.io.JSON.stringify({
+      var json = this.io.JSON.stringify({
         url: url,
         data: data
       });
 
       // Send the message over the socket
-      socket.emit(method, json, function afterEmitted(result) {
-
+      this.emit(method, json, function afterEmitted(result) {
         var parsedResult = result;
+        console.log('result', result);
         try {
           parsedResult = window.io.JSON.parse(result);
         } catch (e) {
@@ -128,7 +120,7 @@ angular.module('BullsAndCows')
         if (parsedResult === 403) throw new Error("403: Forbidden");
         if (parsedResult === 500) throw new Error("500: Server error");
 
-        cb && cb.call(context, parsedResult);
-      });
+        callback && callback.call(context || null, parsedResult);
+      }, this);
     }
   });

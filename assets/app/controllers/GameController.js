@@ -1,4 +1,14 @@
+/**
+ * This is the game controller that handles the functionality
+ * on the /game/:gameId page
+ */
+'use strict';
+
 (function () {
+
+  /**
+   * Constructor
+   */
   var GameController = function ($scope, Location, GameModel, Engine, Player) {
     var gameId = Location.getGameIdFromRequest() || Player.getGame();
     var game = this;

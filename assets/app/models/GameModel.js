@@ -5,118 +5,153 @@
   var _player, _loading, _socket;
 
   var GameModel = function (gameId, context, constructCallback) {
-    var game = this;
-
-    this.player = _player;
+    // resource bindings
     this.gameId = gameId;
+    this.player = _player;
     this.loading = _loading;
-    this.io = _socket;
+    this.socket = _socket;
 
+    // the context in which the object is used (e.g. GameController)
     this.context = context;
     this.scope = context.scope;
 
+    // turn array containers & total counter
     this.hostTurns = [];
     this.guestTurns = [];
-
-    this.ready = false;
     this.turns = 0;
 
-    this.destroy = function () {
-      this.io.socket.removeAllListeners('guestArrived');
-      this.io.socket.removeAllListeners('turn');
-      this.io.socket.removeAllListeners('prematureClose');
-      this.io.post('/game/end/' + this.gameId);
-      this.scope.$apply();
-    }
+    // game state
+    this.ready = false;
 
-    this.loadTurns = function (turns) {
-      if (!_.isArray(turns))
-        turns = [turns];
-
-      _.each(turns, function (turn) {
-        if (turn.playerId === this.data.hostId) {
-          this.hostTurns.push(turn);
-        } else {
-          this.guestTurns.push(turn);
-        }
-
-        if (turn.isWinning) {
-          this.data.isOver = true;
-          this.winner = turn.playerId;
-          this.winnerIsBot = turn.isBotTurn;
-          this.destroy();
-        }
-
-        this.turns++;
-      }, this);
-      game.scope.$apply();
-    }
-
-    this.loading.show();
-    this.io.get('/game/enter/' + gameId, function (response) {
-      console.debug('[SERVER] Game Enter:', response);
-      game.loading.hide();
-
-      game.data = response.game;
-      if (game.data.hostId === game.player.getId()) {
-        game.player.playHost();
-      } else {
-        game.player.playGuest();
-      }
-
-      game.loadTurns(response.turns);
-      constructCallback.call(game.context, game);
-    });
-
-    this.io.socket.on('guestArrived', function (player) {
+    // [socket listener] a guest joins the game
+    this.socket.on('guestArrived', function (player) {
       console.debug('[SOCKET] Guest joined:', player);
-      game.setGuest.call(game, player);
-    })
+      this.setGuest(player);
+    }, this);
 
-    this.io.socket.on('turn', function (data) {
+    // [socket listener] a turn is played
+    this.socket.on('turn', function (data) {
       console.debug('[SOCKET] New turn is played:', data);
-      game.addTurn.call(game, data.game, data.turn);
-    })
+      this.addTurn(data.game, data.turn);
+    }, this);
 
-    // when a game closes prematurely
-    this.io.socket.on('prematureClose', function (data) {
+    // [socket listener] a game closes prematurely
+    this.socket.on('prematureClose', function (data) {
       console.debug('[SOCKET] Game closed prematurely:', data);
-      game.prematureClose.call(game, data);
-    })
+      this.prematureClose(data);
+    }, this);
+
+    // [init] game data from the server
+    this.loading.show();
+    this.socket.get('/game/enter/' + gameId, function (response) {
+      this.loadData(response, constructCallback);
+    }, this);
   }
 
+  /**
+   * Loads data in the game object
+   * @param  {Object}   response :: Response object from server
+   * @param  {Function} callback :: Construct callback - receives the object
+   */
+  GameModel.prototype.loadData = function (response, callback) {
+    console.debug('[SERVER] Game Enter:', response);
+    this.loading.hide();
+
+    this.data = response.game;
+    if (this.data.hostId === this.player.getId()) {
+      this.player.playHost();
+    } else {
+      this.player.playGuest();
+    }
+
+    this.loadTurns(response.turns);
+    callback.call(this.context, this);
+  }
+
+  /**
+   * Desotrys a game session by unregistering all event
+   * listeners and sending a message to the server, that
+   * unsubscribes the socket from it
+   */
+  GameModel.prototype.destroy = function () {
+    this.socket.off('guestArrived');
+    this.socket.off('turn');
+    this.socket.off('prematureClose');
+    this.socket.post('/game/end/' + this.gameId);
+    this.scope.$apply();
+  }
+
+  /**
+   * Load an array of turns
+   * @param {Array|Object} turns :: Either a single or
+   *                                an array of turn objects
+   */
+  GameModel.prototype.loadTurns = function (turns) {
+    if (!_.isArray(turns))
+      turns = [turns];
+
+    _.each(turns, function (turn) {
+      if (turn.playerId === this.data.hostId) {
+        this.hostTurns.push(turn);
+      } else {
+        this.guestTurns.push(turn);
+      }
+
+      if (turn.isWinning) {
+        this.data.isOver = true;
+        this.winner = turn.playerId;
+        this.winnerIsBot = turn.isBotTurn;
+        this.destroy();
+      }
+
+      this.turns++;
+    }, this);
+
+    this.scope.$apply();
+  }
+
+  /**
+   * Add a single turn to the game and updates the game
+   * state, based on what the previous turn was
+   * @param {object} game
+   * @param {turn}   turn
+   */
   GameModel.prototype.addTurn = function (game, turn) {
-    this.data.isOver = game.isOver;
-    this.data.isHostTurn = game.isHostTurn;
+    _.merge(this.data, game);
     this.loadTurns(turn);
   }
 
+  /**
+   * Grabs an object
+   * @param  {Function} callback [description]
+   * @param  {[type]}   context  [description]
+   * @return {[type]}            [description]
+   */
   GameModel.prototype.getSecret = function (callback, context) {
-    var game = this;
     this.loading.show();
-    this.io.get('/game/secret/' + game.gameId, function (response) {
+    this.socket.get('/game/secret/' + game.gameId, function (response) {
       console.debug('[SERVER] Game Secret:', response);
-      game.loading.hide();
+
+      this.loading.hide();
       callback.call(context, response.message);
-      game.scope.$apply();
-    })
+      this.scope.$apply();
+    }, this);
   }
 
   GameModel.prototype.playTurn = function (data, success, fail, context) {
-    var game = this;
     this.loading.show();
-    this.io.post('/game/turn', data, function (response) {
+    this.socket.post('/game/turn', data, function (response) {
       console.debug('[SERVER] Game Play Turn:', response);
-      game.loading.hide();
 
+      this.loading.hide();
       if (response.errors) {
         fail.call(context, response.errors);
       } else {
         success.call(context, response);
       }
 
-      game.scope.$apply();
-    })
+      this.scope.$apply();
+    }, this);
   }
 
   GameModel.prototype.lastTurnIsBot = function () {
@@ -131,14 +166,12 @@
   }
 
   GameModel.prototype.prematureClose = function (game) {
-    this.data.isPrematureClosed = game.isPrematureClosed;
-    this.data.isOver = game.isOver;
+    _.merge(this.data, game);
     this.scope.$apply();
   }
 
   GameModel.prototype.setGuest = function (data) {
-    this.data.guest = data.guest;
-    this.data.guestId = data.guestId;
+    _.merge(this.data, data);
     this.scope.$apply();
   }
 
