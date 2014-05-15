@@ -33,4 +33,4 @@
   }
 
   angular.module('BullsAndCows').service('PlayModes', PlayModes);
-})()
+})();

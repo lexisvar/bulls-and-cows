@@ -76,4 +76,4 @@
 
   angular.module('BullsAndCows').service('Player', Player);
 
-})()
+})();

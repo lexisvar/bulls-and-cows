@@ -16,4 +16,4 @@
 
   angular.module('BullsAndCows').service('Loading', Loading);
 
-})()
+})();

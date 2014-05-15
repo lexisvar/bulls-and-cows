@@ -1,3 +1,5 @@
+'use strict';
+
 (function () {
 
   var Location = function ($location, $routeParams, Player) {
@@ -33,4 +35,4 @@
   Location.$inject = ['$location', '$routeParams', 'Player'];
   angular.module('BullsAndCows').service('Location', Location);
 
-})()
+})();

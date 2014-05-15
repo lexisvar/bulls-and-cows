@@ -1,3 +1,5 @@
+'use strict';
+
 (function () {
   var Front = function ($scope, Player, Location, Loading) {
     this.player = Player;
@@ -30,4 +32,4 @@
   }
 
   angular.module('BullsAndCows').controller('FrontController', Front);
-})()
+})();

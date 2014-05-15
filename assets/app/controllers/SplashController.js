@@ -63,4 +63,4 @@
   }
 
   angular.module('BullsAndCows').controller('SplashController', Splash);
-})()
+})();

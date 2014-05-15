@@ -101,4 +101,4 @@
   LobbyModel.$factory.$inject = ['$socket', 'Loading'];
 
   angular.module('BullsAndCows').service('LobbyModel', LobbyModel.$factory);
-})()
+})();
