@@ -23,18 +23,6 @@
     this.engine = Engine;
     this.player = Player;
 
-    this.pupulateSet = function () {
-      if (!this.session.data.isOver && this.session.data.isWithBot) {
-        this.secretSet = this.engine.getSetCopy();
-
-        if (this.session.turns > 0) {
-          var filter = this.engine.filterTurns;
-          var guestTurns = this.session.guestTurns;
-          this.secretSet = filter(this.secretSet, guestTurns);
-        }
-      }
-    }
-
     new GameModel(gameId, this, function (game) {
       this.session = game;
       this.pupulateSet();
@@ -44,6 +32,18 @@
     $scope.$on('$destroy', function () {
       game.session.destroy.call(game.session);
     })
+  }
+
+  GameController.prototype.pupulateSet = function () {
+    if (!this.session.data.isOver && this.session.data.isWithBot) {
+      this.secretSet = this.engine.getSetCopy();
+
+      if (this.session.turns > 0) {
+        var filter = this.engine.filterTurns;
+        var guestTurns = this.session.guestTurns;
+        this.secretSet = filter(this.secretSet, guestTurns);
+      }
+    }
   }
 
   GameController.prototype.playTurn = function () {
@@ -73,8 +73,10 @@
     this.secretSet = this.engine.filterSet(this.secretSet, response.guess, score);
   }
 
-  GameController.prototype.turnFail = function (erorr) {
-    this.form.error = error;
+  GameController.prototype.turnFail = function (errors) {
+    if (errors.guess) {
+      this.form.error = errors.guess;
+    }
   }
 
   GameController.prototype.getSecret = function () {

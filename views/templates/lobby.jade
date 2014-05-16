@@ -26,7 +26,7 @@ section.lobby
     .buttons
       button(ng-click="lobby.create.form = true") Create New Game
       button(ng-click="joinGame()" 
-        ng-enabled="lobby.join.selected !== false") Join Game
+        ng-disabled="lobby.join.selected === false") Join Game
 
 // JOIN GAME FORM
 .joinGame.cover(ng-show="lobby.join.form")
@@ -52,9 +52,9 @@ section.lobby
         ng-class="{current: lobby.create.mode === modeId}")
         | {{mode.title}}
         input(type="radio"
-          ng-model="game.mode"
+          ng-model="lobby.create.mode"
           ng-value="modeId"
-          ng-click="lobby.create.mode = modeId")
+          ng-click="lobby.create.errors = {}")
 
     // MULTIPLAYER FORM 
     div.multiplayerForm(
@@ -73,8 +73,8 @@ section.lobby
             ng-class="{error: lobby.create.errors['title']}")
 
         label(
-          ng-show="!lobby.play.modes[lobby.create.mode].isCooperative")
-            | Enter a Secret Number
+          ng-hide="lobby.play.modes[lobby.create.mode].isCooperative")
+          | Enter a Secret Number
           input.secret(type="text"
             placeholder="enter secret"
             ng-model="lobby.create.secret"

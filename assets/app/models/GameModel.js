@@ -129,7 +129,7 @@
    */
   GameModel.prototype.getSecret = function (callback, context) {
     this.loading.show();
-    this.socket.get('/game/secret/' + game.gameId, function (response) {
+    this.socket.get('/game/secret/' + this.gameId, function (response) {
       console.debug('[SERVER] Game Secret:', response);
 
       this.loading.hide();
@@ -162,7 +162,11 @@
   }
 
   GameModel.prototype.getWinnerName = function () {
-    return this.winnerId === this.data.hostId ? this.data.host : this.data.guest;
+    if (this.winnerId === this.data.hostId) {
+      return this.data.host;
+    } else {
+      return this.data.guest;
+    }
   }
 
   GameModel.prototype.prematureClose = function (game) {
